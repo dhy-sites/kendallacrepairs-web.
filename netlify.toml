@@ -1,0 +1,5 @@
+# Netlify genera la web con la plantilla en cada cambio.
+# Si la auditoría encuentra un error, el despliegue falla y la web publicada NO cambia (queda la anterior).
+[build]
+  command = "python3 build.py && python3 auditoria.py"
+  publish = "sitio"

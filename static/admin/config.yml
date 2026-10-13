@@ -1,0 +1,64 @@
+# Panel del blog de kendallacrepairs.com (Sveltia CMS)
+# Cada artículo guardado aquí crea un cambio en GitHub y Netlify publica la web sola en 1-2 minutos.
+backend:
+  name: github
+  repo: PROPIETARIO/REPOSITORIO
+  branch: main
+  commit_messages:
+    create: "Blog: nuevo artículo {{slug}}"
+    update: "Blog: editar {{slug}}"
+    delete: "Blog: borrar {{slug}}"
+    uploadMedia: "Blog: subir imagen {{path}}"
+    deleteMedia: "Blog: borrar imagen {{path}}"
+
+site_url: https://kendallacrepairs.com
+display_url: https://kendallacrepairs.com
+logo_url: /admin/logo.svg
+media_folder: static/uploads
+public_folder: /uploads
+
+collections:
+  - name: blog
+    label: Artículos del blog
+    label_singular: artículo
+    description: "Cada artículo tiene versión en español y en inglés. Mínimo unas 400 palabras por idioma para que ayude en Google."
+    folder: blog
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: titulo_es
+    slug: "{{fields.slug_es}}"
+    summary: "{{titulo_es}} · {{fecha}}"
+    sortable_fields: [fecha, titulo_es]
+    fields:
+      - { label: "Fecha de publicación", name: fecha, widget: datetime, time_format: false, date_format: "YYYY-MM-DD", format: "YYYY-MM-DD" }
+      - { label: "Título (español)", name: titulo_es, widget: string, hint: "Entre 40 y 60 letras. Incluye la ciudad: Miami, Kendall o Miami-Dade." }
+      - { label: "Dirección web (español)", name: slug_es, widget: string, hint: "Solo minúsculas, números y guiones. Ejemplo: mini-split-ruido-miami", pattern: ["^[a-z0-9-]+$", "Solo minúsculas, números y guiones, sin acentos ni espacios"] }
+      - { label: "Descripción para Google (español)", name: desc_es, widget: text, hint: "Entre 70 y 160 letras. Es el texto que sale debajo del título en Google." }
+      - { label: "Introducción (español)", name: intro_es, widget: text }
+      - { label: "Texto del artículo (español)", name: cuerpo_es, widget: markdown, buttons: [bold, italic, link, heading-two, heading-three, bulleted-list, numbered-list], editor_components: [image], hint: "Usa Título 2 para cada sección y listas con viñetas. Mínimo unas 400 palabras." }
+      - { label: "Title (English)", name: titulo_en, widget: string }
+      - { label: "Web address (English)", name: slug_en, widget: string, pattern: ["^[a-z0-9-]+$", "Lowercase letters, numbers and hyphens only"] }
+      - { label: "Google description (English)", name: desc_en, widget: text, hint: "70 to 160 characters." }
+      - { label: "Introduction (English)", name: intro_en, widget: text }
+      - { label: "Article text (English)", name: cuerpo_en, widget: markdown, buttons: [bold, italic, link, heading-two, heading-three, bulleted-list, numbered-list], editor_components: [image] }
+      - { label: "Imagen principal (opcional)", name: imagen, widget: image, required: false, hint: "Horizontal, mínimo 1600×900. Si la dejas vacía se usa la foto de Pexels de abajo." }
+      - { label: "Foto de Pexels (número)", name: pexels, widget: number, value_type: int, default: 6471914, required: false, hint: "El número que aparece en la dirección de la foto en pexels.com" }
+      - label: "Servicios relacionados (1 a 3)"
+        name: servicios
+        widget: select
+        multiple: true
+        min: 1
+        max: 3
+        options:
+          - { label: "AC que no enfría", value: "ac-no-enfria" }
+          - { label: "AC que gotea agua", value: "ac-gotea-agua" }
+          - { label: "AC que hace ruido", value: "ac-hace-ruido" }
+          - { label: "AC que no enciende", value: "ac-no-enciende" }
+          - { label: "Mantenimiento de AC", value: "mantenimiento-ac" }
+          - { label: "Instalación y reemplazo de AC", value: "instalacion-ac" }
+          - { label: "Recarga de gas (refrigerante)", value: "recarga-gas-ac" }
+          - { label: "Limpieza de ductos", value: "limpieza-ductos" }
+          - { label: "Termostatos", value: "termostato" }
+          - { label: "Mini splits", value: "mini-split" }
