@@ -2,7 +2,7 @@
 # Cada artículo guardado aquí crea un cambio en GitHub y Netlify publica la web sola en 1-2 minutos.
 backend:
   name: github
-  repo: PROPIETARIO/REPOSITORIO
+  repo: dhy-sites/kendallacrepairs-web.
   branch: main
   commit_messages:
     create: "Blog: nuevo artículo {{slug}}"
