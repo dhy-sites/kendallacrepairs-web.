@@ -305,9 +305,9 @@ footer .legalrow a{margin-right:16px;text-decoration:underline}
 .legal{max-width:760px}.legal h1{color:var(--navy);font-size:40px;text-transform:uppercase}.legal h2{font-size:24px;color:var(--navy);margin-top:28px}
 .center{text-align:center}.center .btns{justify-content:center}
 /* barra móvil */
-.bar{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:3fr 2fr;z-index:30;box-shadow:0 -3px 12px rgba(0,0,0,.18)}
+.bar{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr;z-index:30;box-shadow:0 -3px 12px rgba(0,0,0,.18)}
 .bar a{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px 6px;color:#fff;font-weight:700;text-decoration:none;font-size:17px;white-space:nowrap}
-.bar .c{background:var(--red)}.bar .w{background:#157A3F}
+.bar .c{background:var(--red)}
 @media(min-width:600px) and (max-width:899px){.g5{grid-template-columns:1fr 1fr}}
 @media(min-width:1100px){.g5{grid-template-columns:repeat(5,1fr)}.g5 .svc{padding:20px}.g5 .svc h3{font-size:21px}}
 .callbtn strong{white-space:nowrap}
@@ -330,9 +330,6 @@ footer .legalrow a{margin-right:16px;text-decoration:underline}
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
          '<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">')
 
-def wa_link(lang):
-    msg = "Hola, necesito un técnico de AC en " + S["city"] if lang == "es" else "Hi, I need an AC technician in " + S["city"]
-    return f"https://wa.me/{S['whatsapp']}?text=" + msg.replace(" ", "%20")
 
 def gmap(lang, place, zoom=12):
     """Mapa de Google de la ZONA (sin pin de dirección). Carga diferida para no afectar la velocidad."""
@@ -380,7 +377,7 @@ def head(lang, title, desc, path, alt_path, schemas, img=None):
         extra += (f'<script async src="https://www.googletagmanager.com/gtag/js?id={S["ga4_id"]}"></script>'
                   f'<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag("js",new Date());gtag("config","{S["ga4_id"]}");'
                   'document.addEventListener("click",function(e){var a=e.target.closest("a");if(!a)return;var h=a.getAttribute("href")||"";'
-                  'if(h.indexOf("tel:")===0)gtag("event","llamada",{link_url:h});if(h.indexOf("wa.me")>-1)gtag("event","whatsapp",{link_url:h});});</script>\n')
+                  'if(h.indexOf("tel:")===0)gtag("event","llamada",{link_url:h});});</script>\n')
     ld = "".join(f'<script type="application/ld+json">{json.dumps(s, ensure_ascii=False)}</script>' for s in schemas)
     return f"""<!doctype html>
 <html lang="{lang}">
@@ -441,8 +438,7 @@ def hero(lang, h1, sub, crumb="", eyebrow=None, img=None):
     eb = f'<span class="eyebrow">{E(eyebrow)}</span>' if eyebrow else ""
     return f"""<main><section class="hero" style="background-image:url('{img or IMG_HERO}')"><div class="wrap"><div>{crumb}{eb}
 <h1>{E(h1)}</h1><p class="sub">{E(sub)}</p>
-<div class="btns"><a class="btn b-call" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']} {S['phone_display']}</a>
-<a class="btn b-ghost" href="{wa_link(lang)}" target="_blank" rel="noopener">{icon('wa', 20)} {u['wa']}</a></div>
+<div class="btns"><a class="btn b-call" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']} {S['phone_display']}</a></div>
 <ul class="ticks">{ticks}</ul></div>{form(lang)}</div></section>
 <div class="trust"><div class="wrap">{''.join(f'<div>{icon(i, 28)}<p style="margin:0"><b>{t}</b><span>{d}</span></p></div>' for i, t, d in u['trust_icons'])}</div></div>"""
 
@@ -537,7 +533,7 @@ def footer(lang):
 <div class="legalrow"><a href="{LEGAL[lang]['privacy']}">{u['privacy']}</a><a href="{LEGAL[lang]['terms']}">{u['terms']}</a>
 <span>© {datetime.date.today().year} {S['operator']}</span></div>
 </div></footer>
-<div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']}</a><a class="w" href="{wa_link(lang)}" target="_blank" rel="noopener">{icon('wa', 20)} {u['wa']}</a></div>
+<div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']} {S['phone_display']}</a></div>
 </body></html>"""
 
 def crumbs_schema(lang, items):
@@ -881,7 +877,7 @@ def extras():
     write("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: {S['domain']}/sitemap.xml\n")
     # ficha de salud: la revisión automática semanal la compara con la web publicada
     write("salud.json", json.dumps({"version": SITE_VERSION, "generada": TODAY, "telefono": S["phone_display"],
-                                    "telefono_tel": S["phone_tel"], "whatsapp": S["whatsapp"], "paginas": len(PAGES),
+                                    "telefono_tel": S["phone_tel"], "paginas": len(PAGES),
                                     "ga4": S.get("ga4_id", ""), "revisar": [S["domain"] + p for p in PAGES[:3]] +
                                     [S["domain"] + "/sitemap.xml"]}, ensure_ascii=False, indent=1))
     nf = (head("es", f"Página no encontrada | {S['brand']}", "404", "/404.html", "/en/", []).replace("<head>", '<head>\n<meta name="robots" content="noindex">')
