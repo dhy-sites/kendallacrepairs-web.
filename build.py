@@ -20,7 +20,7 @@ def load_articles():
     arts.sort(key=lambda a: a[2], reverse=True)
     return arts
 
-SITE_VERSION = "8"
+SITE_VERSION = "9"
 ARTICLES = load_articles()
 
 OUT = os.path.join(os.path.dirname(__file__), "sitio")
@@ -136,13 +136,16 @@ UI["en"].update({
     "map_note": "Reference map of the area we cover. Technicians come to your home; this is not a walk-in office.",
 })
 
-IMG_HERO = "https://images.pexels.com/photos/6471911/pexels-photo-6471911.jpeg?auto=compress&cs=tinysrgb&w=1800"
-def px(i, w=1800): return f"https://images.pexels.com/photos/{i}/pexels-photo-{i}.jpeg?auto=compress&cs=tinysrgb&w={w}"
-SVC_IMG = {"ac-no-enfria": 5463575, "ac-gotea-agua": 32588555, "ac-hace-ruido": 5463580, "ac-no-enciende": 5463585,
-           "mantenimiento-ac": 6471914, "instalacion-ac": 5463587, "recarga-gas-ac": 6471912, "limpieza-ductos": 32497161,
-           "termostato": 5463582, "mini-split": 7347538}
-AREA_POOL = [6471911, 5463575, 32497161, 6471914, 5463587, 7347538, 5463576, 5463582, 6471912, 5463580, 5463585, 32588555, 6471913]
-IMG_UNIT = "https://images.pexels.com/photos/6471913/pexels-photo-6471913.jpeg?auto=compress&cs=tinysrgb&w=1100"
+def px(i, w=1800):
+    # str = foto propia en static/img (versión 9); int = foto de Pexels
+    if isinstance(i, str): return f"{SITE['domain']}/img/{i}.jpg"
+    return f"https://images.pexels.com/photos/{i}/pexels-photo-{i}.jpeg?auto=compress&cs=tinysrgb&w={w}"
+IMG_HERO = px("portada")
+SVC_IMG = {s: s for s in ["ac-no-enfria", "ac-gotea-agua", "ac-hace-ruido", "ac-no-enciende", "mantenimiento-ac",
+                          "instalacion-ac", "recarga-gas-ac", "limpieza-ductos", "termostato", "mini-split"]}
+AREA_POOL = ["barrio-calle", "barrio-townhouses", "barrio-patio", "manometros", "mantenimiento-ac", "ac-hace-ruido",
+             "ac-no-enciende", "instalacion-ac", "recarga-gas-ac", "portada", "ac-gotea-agua", "ac-no-enfria", "mini-split"]
+IMG_UNIT = px("por-que-elegirnos")
 
 # ---------- íconos (trazos simples, sin emojis) ----------
 ICON_PATHS = {
