@@ -7,7 +7,6 @@ SITE = {
     "domain": "https://kendallacrepairs.com",
     "phone_display": "(305) 306-4511",
     "phone_tel": "+13053064511",
-    "whatsapp": "13053064511",
     "email": "info@kendallacrepairs.com",
     "operator": "DHY Solutions LLC",
     "city": "Kendall",
