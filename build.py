@@ -414,6 +414,7 @@ def schema_business(lang):
             "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
             "opens": "07:00", "closes": "22:00"}],
         "priceRange": "$$", "knowsLanguage": ["es", "en"],
+        "sameAs": [u for _, u in S.get("social", [])],
         "hasOfferCatalog": {"@type": "OfferCatalog", "name": UI[lang]["svc_t"],
             "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": svc(lang, sv)["name"],
                                  "url": S["domain"] + svc_path(lang, sv)}} for sv in SERVICES]},
@@ -637,12 +638,13 @@ def footer(lang):
     u = UI[lang]
     al = "".join(f'<li><a href="{area_path(lang, a[1])}">{a[0]}</a></li>' for a in AREAS)
     sl = "".join(f'<li><a href="{svc_path(lang, sv)}">{E(svc(lang, sv)["name"])}</a></li>' for sv in SERVICES)
+    social_li = ("<li>" + " · ".join(f'<a href="{h}" rel="noopener" target="_blank">{n}</a>' for n, h in S.get("social", [])) + "</li>") if S.get("social") else ""
     return f"""<footer><div class="wrap"><div class="cols">
 <div><div class="fbrand">{LOGO}<b>{E(S['brand'])}</b></div><p>{fmt(u['disclaimer'])}</p></div>
 <div><h2 class="fh">{u["svc_word"]}</h2><ul>{sl}</ul></div>
 <div><h2 class="fh">{u["areas_word"]}</h2><ul>{al}</ul></div>
 <div><h2 class="fh">{u["contact_t"]}</h2><ul><li><a href="tel:{S['phone_tel']}">{S['phone_display']}</a></li>
-<li><a href="mailto:{S['email']}">{S['email']}</a></li><li><a href="{blog_path(lang)}">{'Consejos de AC' if lang == 'es' else 'AC tips'}</a></li><li>{u['hours']}</li><li>{S['city']}, {S['county']} County, {S['state']}</li></ul></div>
+<li><a href="mailto:{S['email']}">{S['email']}</a></li><li><a href="{blog_path(lang)}">{'Consejos de AC' if lang == 'es' else 'AC tips'}</a></li><li>{u['hours']}</li><li>{S['city']}, {S['county']} County, {S['state']}</li>{social_li}</ul></div>
 </div>
 <div class="legalrow"><a href="{ABOUT[lang]['slug']}">{ABOUT[lang]['title']}</a><a href="{LEGAL[lang]['privacy']}">{u['privacy']}</a><a href="{LEGAL[lang]['terms']}">{u['terms']}</a>
 <span>© {datetime.date.today().year} {S['operator']}</span></div>

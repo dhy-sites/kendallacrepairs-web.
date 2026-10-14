@@ -13,6 +13,11 @@ SITE = {
     "county": "Miami-Dade",
     "state": "FL",
     # Google: pega aquí los códigos cuando los tengas (déjalos vacíos si no)
+    # Perfiles oficiales del negocio (Google los usa para saber que son el mismo negocio)
+    "social": [
+        ("Facebook", "https://www.facebook.com/kendallacrepairs"),
+        ("Instagram", "https://www.instagram.com/kendallacrepairsfl"),
+    ],
     "ga4_id": "G-DRFTR128F9",            # ej. "G-XXXXXXXXXX" (Google Analytics)
     "gsc_verification": "",    # código de verificación de Google Search Console (etiqueta HTML)
     # colores de marca
@@ -253,7 +258,7 @@ AUTHOR = {
     "name": "Equipo Kendall AC Repairs",
     "photo": "",                     # ej. "/img/autor.jpg" (opcional)
     "license": "",                   # ej. "CAC1819xxx" (licencia de Florida del contratista)
-    "links": [],                     # perfiles públicos de la misma persona/marca: LinkedIn, Facebook, Google
+    "links": [u for _, u in SITE["social"]],                     # perfiles públicos de la misma persona/marca: LinkedIn, Facebook, Google
     "es": {
         "role": "Coordinación de servicio de aire acondicionado en Kendall",
         "bio": "Coordinamos reparaciones de aire acondicionado en Kendall y conectamos a cada vecino con un técnico con licencia de Florida. Nuestros consejos se basan en los problemas más comunes de los equipos en casas del sur de la Florida: drenajes tapados, pérdida de gas y equipos que no dan abasto con la humedad.",
