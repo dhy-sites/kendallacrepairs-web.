@@ -43,7 +43,7 @@ UI = {
         "areas_t": "Zonas que cubrimos", "areas_s": "Servicio en {city} y comunidades cercanas.",
         "faq_t": "Preguntas frecuentes",
         "cta_t": "¿Tu AC está fallando? No esperes a mañana.",
-        "trust": ["Técnicos con licencia de Florida", "Precio claro antes de empezar", "Se habla español", "7 días a la semana"],
+        "trust": ["Atendemos de 7 am a 10 pm, los 7 días", "Diagnóstico desde $75 y precio claro antes de empezar", "Al llamar te atiende una persona, en español", "Técnicos con licencia de Florida"], "book": "Pedir cita",
         "disclaimer": "{brand} es un servicio de referidos operado por {op}. Los trabajos los realizan contratistas independientes con licencia en Florida.",
         "privacy": "Privacidad", "terms": "Términos", "areas_word": "Zonas",
         "area_h1": "{service} en {area}", "area_more": "Otras zonas cercanas",
@@ -64,7 +64,7 @@ UI = {
         "areas_t": "Areas we serve", "areas_s": "Service in {city} and nearby communities.",
         "faq_t": "Frequently asked questions",
         "cta_t": "AC acting up? Don't wait until tomorrow.",
-        "trust": ["Florida-licensed technicians", "Clear price up front", "Se habla español", "7 days a week"],
+        "trust": ["Open 7 am to 10 pm, 7 days a week", "Diagnostic from $75, clear price up front", "A real person answers, in English or Spanish", "Florida-licensed technicians"], "book": "Book a visit",
         "disclaimer": "{brand} is a referral service operated by {op}. All work is performed by independent Florida-licensed contractors.",
         "privacy": "Privacy", "terms": "Terms", "areas_word": "Areas",
         "area_h1": "{service} in {area}", "area_more": "Other nearby areas",
@@ -366,9 +366,9 @@ footer .legalrow a{margin-right:16px;text-decoration:underline}
 .legal{max-width:760px}.legal h1{color:var(--navy);font-size:40px;text-transform:uppercase}.legal h2{font-size:24px;color:var(--navy);margin-top:28px}
 .center{text-align:center}.center .btns{justify-content:center}
 /* barra móvil */
-.bar{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr;z-index:30;box-shadow:0 -3px 12px rgba(0,0,0,.18)}
+.bar{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:3fr 2fr;z-index:30;box-shadow:0 -3px 12px rgba(0,0,0,.18)}
 .bar a{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px 6px;color:#fff;font-weight:700;text-decoration:none;font-size:17px;white-space:nowrap}
-.bar .c{background:var(--red)}
+.bar .c{background:var(--red)}.bar .f{background:var(--navy)}
 @media(min-width:600px) and (max-width:899px){.g5{grid-template-columns:1fr 1fr}}
 @media(min-width:1100px){.g5{grid-template-columns:repeat(5,1fr)}.g5 .svc{padding:20px}.g5 .svc h3{font-size:21px}}
 .callbtn strong{white-space:nowrap}
@@ -446,7 +446,8 @@ def head(lang, title, desc, path, alt_path, schemas, img=None):
         extra += (f'<script async src="https://www.googletagmanager.com/gtag/js?id={S["ga4_id"]}"></script>'
                   f'<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag("js",new Date());gtag("config","{S["ga4_id"]}");'
                   'document.addEventListener("click",function(e){var a=e.target.closest("a");if(!a)return;var h=a.getAttribute("href")||"";'
-                  'if(h.indexOf("tel:")===0)gtag("event","llamada",{link_url:h});});</script>\n')
+                  'if(h.indexOf("tel:")===0)gtag("event","llamada",{link_url:h});if(h.indexOf("#form")>-1)gtag("event","pedir_cita",{link_url:h});});'
+                  'document.addEventListener("submit",function(e){if(e.target&&e.target.name==="lead")gtag("event","formulario",{idioma:document.documentElement.lang});});</script>\n')
     ld = "".join(f'<script type="application/ld+json">{json.dumps(s, ensure_ascii=False)}</script>' for s in schemas)
     return f"""<!doctype html>
 <html lang="{lang}">
@@ -643,7 +644,7 @@ def footer(lang):
 <div class="legalrow"><a href="{LEGAL[lang]['privacy']}">{u['privacy']}</a><a href="{LEGAL[lang]['terms']}">{u['terms']}</a>
 <span>© {datetime.date.today().year} {S['operator']}</span></div>
 </div></footer>
-<div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']} {S['phone_display']}</a></div>
+<div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']}</a><a class="f" href="#form">{icon('check', 20)} {u['book']}</a></div>
 </body></html>"""
 
 def crumbs_schema(lang, items):
