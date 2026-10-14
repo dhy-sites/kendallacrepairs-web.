@@ -7,7 +7,7 @@ SITE = {
     "domain": "https://kendallacrepairs.com",
     "phone_display": "(305) 306-4511",
     "phone_tel": "+13053064511",
-    "email": "info@kendallacrepairs.com",
+    "email": "kendallacrepairs@gmail.com",
     "operator": "DHY Solutions LLC",
     "city": "Kendall",
     "county": "Miami-Dade",
