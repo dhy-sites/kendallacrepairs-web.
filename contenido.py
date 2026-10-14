@@ -135,6 +135,32 @@ SVC_EXTRA = {
          "faq": [("Why is my mini split blinking?", "It's showing an error code. Write it down or take a photo: it tells the technician what to check."),
                  ("Why is my mini split dripping?", "It's almost always a clogged drain or a dirty filter freezing the coil."),
                  ("Can a mini split go in a converted garage?", "Yes, it's one of the most common options for room additions, garages and efficiencies.")]}},
+ "reparacion-ac-emergencia": {
+  "es": {"check": ["Seguridad eléctrica: breaker, caja de desconexión y cables", "Capacitor y contactor, las fallas más comunes en pleno verano", "Bandeja y línea de drenaje si hay agua", "Que el equipo arranque y enfríe antes de irse"],
+         "price": "Un servicio urgente puede costar más que una visita normal, sobre todo de noche, en fin de semana o en los días de más calor. Muchas emergencias son piezas pequeñas, como un capacitor o un contactor, que se cambian en la misma visita. El técnico te dice el precio antes de empezar y tú decides.",
+         "tip": "Si huele a quemado o ves chispas, apaga el breaker del AC y no lo vuelvas a prender. Si cae agua, apaga el equipo y pon un cubo o toallas. Mientras llega el técnico, cierra cortinas, usa ventiladores y toma agua.",
+         "faq": [["¿Atienden emergencias de AC hoy mismo en Kendall?", "Sí, según la disponibilidad de técnicos en tu zona. Llámanos y te decimos en el momento si hay alguien que pueda ir hoy."],
+                 ["¿Cuánto cuesta una reparación de AC de emergencia?", "Depende de la falla y de la hora. La visita urgente suele costar más que en horario normal. El técnico te da el precio antes de empezar y no se hace nada sin tu aprobación."],
+                 ["¿Qué hago si el AC se apagó y hace mucho calor?", "Revisa el termostato y el breaker. Si no arranca, no lo fuerces. Cierra cortinas, usa ventiladores y, si hay bebés o personas mayores, llévalos a un lugar fresco mientras llega el técnico."]]},
+  "en": {"check": ["Electrical safety: breaker, disconnect box and wiring", "Capacitor and contactor, the most common failures in peak summer", "Drain pan and drain line if there's water", "That the unit starts and cools before the tech leaves"],
+         "price": "An urgent call can cost more than a regular visit, especially at night, on weekends or on the hottest days. Many emergencies are small parts, like a capacitor or contactor, replaced in the same visit. The technician gives you the price before starting and you decide.",
+         "tip": "If you smell burning or see sparks, switch off the AC breaker and don't turn it back on. If water is dripping, turn the unit off and set out a bucket or towels. While you wait, close the blinds, run fans and drink water.",
+         "faq": [["Can you handle an AC emergency today in Kendall?", "Yes, based on technician availability in your area. Call us and we'll tell you right away if someone can come today."],
+                 ["How much does emergency AC repair cost?", "It depends on the problem and the time of day. An urgent visit usually costs more than a regular one. The technician gives you the price before starting and nothing is done without your approval."],
+                 ["What should I do if my AC quits and it's very hot?", "Check the thermostat and the breaker. If it won't start, don't force it. Close the blinds, run fans and, if there are babies or older adults, take them somewhere cool until the technician arrives."]]}},
+ "calidad-aire-humedad": {
+  "es": {"check": ["Humedad dentro de la casa, con un medidor", "Tamaño del equipo: uno demasiado grande enfría rápido pero no seca el aire", "Serpentín, bandeja y drenaje del manejador de aire", "Filtros, ductos y entradas de aire"],
+         "price": "Muchas veces basta con limpiar el serpentín, ajustar la velocidad del ventilador o poner un filtro mejor, que son trabajos pequeños. Un deshumidificador para toda la casa o una luz UV es una instalación más grande. El técnico mide la humedad y te explica las opciones con su precio antes de empezar.",
+         "tip": "Deja el ventilador del termostato en AUTO y no en ON. En ON el aire sigue pasando por el serpentín mojado y devuelve esa humedad a la casa.",
+         "faq": [["¿Qué humedad es la ideal dentro de la casa?", "Por debajo de 60 %, y mejor entre 40 % y 50 %. Con más humedad crecen el moho y los ácaros y aparece el olor a humedad."],
+                 ["¿Mi AC puede quitar la humedad solo?", "Sí, si tiene el tamaño correcto y está limpio. Un equipo demasiado grande o con el serpentín sucio enfría pero deja la casa húmeda."],
+                 ["¿Sirven las luces UV para el aire acondicionado?", "Ayudan a que no crezcan moho y bacterias en el serpentín, que siempre está húmedo. No reemplazan el mantenimiento ni la limpieza de ductos."]]},
+  "en": {"check": ["Indoor humidity, measured with a meter", "System size: an oversized unit cools fast but doesn't dry the air", "Air handler coil, drain pan and drain line", "Filters, ducts and return vents"],
+         "price": "Often all it takes is cleaning the coil, adjusting the blower speed or switching to a better filter, which are small jobs. A whole-home dehumidifier or a UV light is a bigger installation. The technician measures the humidity and walks you through the options with prices before starting.",
+         "tip": "Keep the thermostat fan on AUTO, not ON. On ON, air keeps flowing over the wet coil and puts that moisture back into the house.",
+         "faq": [["What's the ideal indoor humidity?", "Below 60 %, ideally between 40 % and 50 %. Above that, mold and dust mites grow and the house smells musty."],
+                 ["Can my AC remove humidity on its own?", "Yes, if it's the right size and clean. An oversized unit or a dirty coil cools but leaves the house damp."],
+                 ["Do UV lights for the AC work?", "They help keep mold and bacteria from growing on the coil, which is always wet. They don't replace maintenance or duct cleaning."]]}}
 }
 
 # Por barrio: servicios más pedidos (slugs ES), barrios vecinos (slugs), tipo de vivienda (es, en)

@@ -131,6 +131,15 @@ AREAS += [
 
 # Servicios: slug ES, slug EN, (nombre, h1, párrafo 1, párrafo 2, [señales]) por idioma
 SERVICES = [
+    ("reparacion-ac-emergencia", "emergency-ac-repair",
+     {"name": "AC de emergencia", "h1": "Reparación de aire acondicionado urgente en {city}",
+      "p1": "Si el aire se apagó en pleno calor, hay un bebé, una persona mayor o alguien enfermo en casa, o está cayendo agua del techo, no es algo para dejar para mañana. Te conectamos con un técnico licenciado que pueda ir hoy mismo, según la disponibilidad en tu zona.",
+      "p2": "Atendemos llamadas los 7 días, de 7 am a 10 pm. Si escribes fuera de ese horario, llena el formulario y te llamamos a primera hora.",
+      "signs": ["El AC se apagó y la casa pasa de 85 °F", "Cae agua del techo o del clóset del AC", "Olor a quemado o chispas en la unidad", "El breaker se dispara cada vez que prende"]},
+     {"name": "Emergency AC Repair", "h1": "Emergency AC repair in {city}",
+      "p1": "If your AC quit in the middle of the heat, there's a baby, an older adult or someone sick at home, or water is dripping from the ceiling, it can't wait until tomorrow. We connect you with a licensed technician who can come today, based on availability in your area.",
+      "p2": "We take calls 7 days a week, 7 am to 10 pm. If you reach out after hours, fill out the form and we'll call you first thing in the morning.",
+      "signs": ["AC stopped and the house is over 85 °F", "Water dripping from the ceiling or AC closet", "Burning smell or sparks at the unit", "Breaker trips every time it starts"]}),
     ("ac-no-enfria", "ac-not-cooling",
      {"name": "AC que no enfría", "h1": "¿Tu AC no enfría? Reparación en {city}",
       "p1": "Cuando el aire acondicionado prende pero sale aire tibio, las causas más comunes son poco gas (refrigerante), un capacitor dañado, el condensador sucio o un filtro tapado. Algunas se arreglan en una sola visita.",
@@ -221,4 +230,13 @@ SERVICES = [
       "p1": "Mini splits are very common in apartments, converted garages and room additions. They need filter and coil cleaning to keep their power.",
       "p2": "If your mini split is blinking an error code, write it down: it helps the technician know what to bring.",
       "signs": ["Blinking light with an error code", "Dripping from the wall unit", "Weak cooling", "Bad smell when it turns on"]}),
+    ("calidad-aire-humedad", "humidity-air-quality",
+     {"name": "Humedad y calidad del aire", "h1": "Control de humedad y calidad del aire en {city}",
+      "p1": "En Miami el AC no solo enfría: también saca la humedad de la casa. Cuando no lo hace bien aparecen olor a moho, paredes que sudan, ropa húmeda y más alergias, aunque el termostato marque la temperatura correcta.",
+      "p2": "Las soluciones van desde limpiar el serpentín y ajustar el ventilador hasta instalar un deshumidificador para toda la casa, una luz UV en el serpentín o filtros de mejor calidad.",
+      "signs": ["La casa se siente pegajosa aunque esté fría", "Olor a humedad o a moho", "Manchas negras en rejillas o techos", "Ventanas o paredes que sudan"]},
+     {"name": "Humidity & Air Quality", "h1": "Humidity control and indoor air quality in {city}",
+      "p1": "In Miami your AC doesn't just cool: it also pulls moisture out of the house. When it doesn't do that well you get a musty smell, sweating walls, damp clothes and worse allergies, even when the thermostat shows the right temperature.",
+      "p2": "Fixes range from cleaning the coil and adjusting the blower to installing a whole-home dehumidifier, a UV light at the coil or better filters.",
+      "signs": ["House feels sticky even when it's cool", "Musty or moldy smell", "Black spots on vents or ceilings", "Sweating windows or walls"]}),
 ]

@@ -141,8 +141,9 @@ def px(i, w=1800):
     if isinstance(i, str): return f"{SITE['domain']}/img/{i}.jpg"
     return f"https://images.pexels.com/photos/{i}/pexels-photo-{i}.jpeg?auto=compress&cs=tinysrgb&w={w}"
 IMG_HERO = px("reparacion-aire-acondicionado-kendall")
-SVC_IMG = {s: s + "-kendall" for s in ["ac-no-enfria", "ac-gotea-agua", "ac-hace-ruido", "ac-no-enciende", "mantenimiento-ac",
-                                       "instalacion-ac", "recarga-gas-ac", "limpieza-ductos", "termostato", "mini-split"]}
+SVC_IMG = {"reparacion-ac-emergencia": "revision-presion-refrigerante-ac-miami", "calidad-aire-humedad": "ac-gotea-agua-kendall"}
+SVC_IMG.update({s: s + "-kendall" for s in ["ac-no-enfria", "ac-gotea-agua", "ac-hace-ruido", "ac-no-enciende", "mantenimiento-ac",
+                                       "instalacion-ac", "recarga-gas-ac", "limpieza-ductos", "termostato", "mini-split"]})
 AREA_POOL = ["calle-residencial-kendall-aire-acondicionado", "townhouses-condensadores-ac-miami-dade", "mini-split-patio-casa-miami",
              "revision-presion-refrigerante-ac-miami", "mantenimiento-ac-kendall", "ac-hace-ruido-kendall", "ac-no-enciende-kendall",
              "instalacion-ac-kendall", "recarga-gas-ac-kendall", "reparacion-aire-acondicionado-kendall", "ac-gotea-agua-kendall",
@@ -222,11 +223,13 @@ ICON_PATHS = {
     "gauge": '<path d="M12 14l4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0z"/>',
     "wind": '<path d="M17.7 7.7A2.5 2.5 0 1 1 19.5 12H2M9.6 4.6A2 2 0 1 1 11 8H2M12.6 19.4A2 2 0 1 0 14 16H2"/>',
     "thermo": '<path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/>',
+    "cloud": '<path d="M7 18a4.5 4.5 0 0 1-.5-9A6 6 0 0 1 18 9.5a4.3 4.3 0 0 1-.5 8.5z"/><path d="M9 21h6"/>',
     "split": '<rect x="2" y="5" width="20" height="9" rx="2"/><path d="M6 11h12M7 18l1-2M12 19v-3M17 18l-1-2"/>',
 }
 SVC_ICON = {"ac-no-enfria": "snow", "ac-gotea-agua": "drop", "ac-hace-ruido": "sound", "ac-no-enciende": "power",
             "mantenimiento-ac": "wrench", "instalacion-ac": "box", "recarga-gas-ac": "gauge",
-            "limpieza-ductos": "wind", "termostato": "thermo", "mini-split": "split"}
+            "limpieza-ductos": "wind", "termostato": "thermo", "mini-split": "split",
+            "reparacion-ac-emergencia": "clock", "calidad-aire-humedad": "cloud"}
 
 def icon(name, size=24, cls="ic"):
     return (f'<svg class="{cls}" width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
@@ -239,7 +242,7 @@ def brand_html(): return E(S['brand']).replace(' AC ', ' <span style="color:var(
 
 CSS = """
 :root{--navy:#0B2545;--navy2:#13315C;--red:#C8102E;--red2:#A50D26;--ink:#1B2430;--mut:#5B6675;--line:#E3E7EC;--soft:#F3F5F8}
-*{box-sizing:border-box}html{scroll-behavior:auto}
+*{box-sizing:border-box}html{scroll-behavior:auto}.ptw{overflow-x:auto;margin:18px 0 10px}.ptable{width:100%;border-collapse:collapse;background:#fff;font-size:17px}.ptable th,.ptable td{padding:11px 14px;border-bottom:1px solid #D9E1EA;text-align:left}.ptable th{background:var(--navy);color:#fff;font-size:14px;text-transform:uppercase;letter-spacing:.04em}.ptable td:last-child{white-space:nowrap;font-weight:700;color:var(--navy)}.pnote{font-size:15px;color:#55657A}
 body{margin:0;font-family:"Source Sans 3",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:17px;color:var(--ink);background:#fff;line-height:1.6;padding-bottom:62px}
 h1,h2,h3,.cond{font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;font-weight:700;line-height:1.08;letter-spacing:.2px}
 a{color:var(--navy2)}img{max-width:100%;display:block}
@@ -510,12 +513,14 @@ SHORT = {
         "ac-hace-ruido": "Golpes, zumbidos o chirridos en el equipo.", "ac-no-enciende": "El equipo no arranca o se apaga solo.",
         "mantenimiento-ac": "Limpieza y revisión para que no falle en verano.", "instalacion-ac": "Equipos nuevos y eficientes, con permiso incluido.",
         "recarga-gas-ac": "Detección de fugas y recarga de refrigerante.", "limpieza-ductos": "Aire más limpio y sin olor a humedad.",
-        "termostato": "Reparación e instalación, también inteligentes.", "mini-split": "Reparación, limpieza e instalación."},
+        "termostato": "Reparación e instalación, también inteligentes.", "mini-split": "Reparación, limpieza e instalación.",
+        "reparacion-ac-emergencia": "Sin AC en pleno calor, agua cayendo u olor a quemado.", "calidad-aire-humedad": "Casa pegajosa, olor a moho, deshumidificadores y luz UV."},
  "en": {"ac-no-enfria": "Warm air, or it never reaches the set temperature.", "ac-gotea-agua": "Water on the floor or ceiling, usually the drain.",
         "ac-hace-ruido": "Banging, buzzing or squealing from the unit.", "ac-no-enciende": "Unit won't start or shuts off by itself.",
         "mantenimiento-ac": "Cleaning and check-up so it won't fail in summer.", "instalacion-ac": "New efficient systems, permit included.",
         "recarga-gas-ac": "Leak detection and refrigerant recharge.", "limpieza-ductos": "Cleaner air with no musty smell.",
-        "termostato": "Repair and installation, including smart models.", "mini-split": "Repair, cleaning and installation."},
+        "termostato": "Repair and installation, including smart models.", "mini-split": "Repair, cleaning and installation.",
+        "reparacion-ac-emergencia": "No AC in the heat, water dripping or a burning smell.", "calidad-aire-humedad": "Sticky house, musty smell, dehumidifiers and UV lights."},
 }
 
 def services_grid(lang, skip=None, title=None, soft=False):
@@ -551,19 +556,58 @@ LOCAL_BLOCK = {
  "es": ("Servicio de aire acondicionado en {city}",
         ["Si buscas reparación de AC cerca de ti en {city}, te conectamos con técnicos de aire acondicionado licenciados y asegurados que trabajan en tu zona. "
          "Atendemos reparaciones urgentes el mismo día según disponibilidad, mantenimiento, instalación de equipos nuevos y mini splits, en casas, townhouses y condominios.",
-         "Precio justo y claro: el técnico te da el presupuesto antes de empezar, sin cargos escondidos. Damos servicio de HVAC en {city}, West Kendall, The Hammocks, "
+         "Precio justo y claro: el técnico te da el presupuesto antes de empezar, sin cargos escondidos. Si buscas una compañía de aire acondicionado en {city} que conteste el teléfono y te mande a alguien de confianza, ese es nuestro trabajo. Damos servicio de HVAC en {city}, West Kendall, The Hammocks, "
          "Kendale Lakes, Pinecrest y el resto del suroeste de Miami-Dade, en español o en inglés."]),
  "en": ("Air conditioning service in {city}",
         ["If you're looking for AC repair near you in {city}, we connect you with licensed and insured air conditioning technicians who work in your area. "
          "We handle urgent same-day repairs based on availability, maintenance, new system installation and mini splits, for houses, townhouses and condos.",
-         "Fair, clear pricing: the technician gives you a quote before starting, with no hidden fees. We provide HVAC service in {city}, West Kendall, The Hammocks, "
+         "Fair, clear pricing: the technician gives you a quote before starting, with no hidden fees. If you're looking for an AC company in {city} that answers the phone and sends someone you can trust, that's what we do. We provide HVAC service in {city}, West Kendall, The Hammocks, "
          "Kendale Lakes, Pinecrest and the rest of southwest Miami-Dade, in English or Spanish."]),
 }
+
+PRICE_ROWS = [("Visita de diagnóstico", "Diagnostic visit", "$75 – $150"),
+              ("Destapar la línea de drenaje", "Clearing the drain line", "$75 – $250"),
+              ("Cambiar el capacitor", "Replacing the capacitor", "$100 – $400"),
+              ("Recarga de refrigerante (sin la fuga)", "Refrigerant recharge (leak not included)", "$100 – $600"),
+              ("Reparar una fuga de refrigerante", "Repairing a refrigerant leak", "$200 – $1,500"),
+              ("Motor del ventilador interior", "Indoor blower motor", "$200 – $900"),
+              ("Serpentín del evaporador", "Evaporator coil", "$400 – $2,700"),
+              ("Compresor", "Compressor", "$600 – $3,000"),
+              ("Equipo central nuevo (3 a 5 toneladas)", "New central system (3 to 5 tons)", "$8,500 – $13,500")]
+PRICE_TXT = {
+ "es": ("¿Cuánto cuesta reparar el aire acondicionado en {city}?",
+        "Precios de referencia para que sepas qué esperar. El precio final lo da el técnico después de revisar el equipo, siempre antes de empezar.",
+        "Reparación", "Precio de referencia",
+        "Rangos de guías de costos de EE. UU. publicadas en 2026. En Miami varían según la empresa, la hora y la urgencia. La mayoría de las reparaciones quedan entre $250 y $700.",
+        "Ver la guía completa de precios"),
+ "en": ("How much does AC repair cost in {city}?",
+        "Reference prices so you know what to expect. The final price comes from the technician after checking the unit, always before any work starts.",
+        "Repair", "Reference price",
+        "Ranges from U.S. cost guides published in 2026. In Miami they vary by company, time of day and urgency. Most repairs land between $250 and $700.",
+        "See the full price guide"),
+}
+def prices(lang):
+    t, intro, c1, c2, note, more = PRICE_TXT[lang]
+    rows = "".join(f"<tr><td>{E(a if lang == 'es' else b)}</td><td>{c}</td></tr>" for a, b, c in PRICE_ROWS)
+    art = next((x for x in ARTICLES if x[0] == "cuanto-cuesta-reparar-aire-acondicionado-miami"), None)
+    link = f' <a href="{blog_path(lang, art)}">{more} →</a>' if art else ""
+    return (f'<section class="blk soft" id="precios"><div class="wrap prose"><h2 class="t">{E(fmt(t))}</h2><p>{E(intro)}</p>'
+            f'<div class="ptw"><table class="ptable"><thead><tr><th>{c1}</th><th>{c2}</th></tr></thead><tbody>{rows}</tbody></table></div>'
+            f'<p class="pnote">{E(note)}{link}</p></div></section>')
+
+def all_zips():
+    seen = []
+    for slug in [a[1] for a in AREAS]:
+        for z in AREA_LOCAL.get(slug, ([],))[0]:
+            if z not in seen: seen.append(z)
+    return sorted(seen)
 
 def local_block(lang):
     t, ps = LOCAL_BLOCK[lang]
     return (f'<section class="blk"><div class="wrap prose"><h2 class="t">{fmt(t)}</h2>'
-            + "".join(f"<p>{E(fmt(p))}</p>" for p in ps) + "</div></section>")
+            + "".join(f"<p>{E(fmt(p))}</p>" for p in ps)
+            + f"<p><b>{'Códigos postales que cubrimos' if lang == 'es' else 'ZIP codes we cover'}:</b> {', '.join(all_zips())}.</p>"
+            + "</div></section>")
 
 def areas(lang, skip=None, title=None):
     u = UI[lang]
@@ -737,7 +781,7 @@ def home(lang):
     eb = n["hero_q"]
     p = base(lang)
     page = (head(lang, title, desc, p, base(other), [schema_website(lang), schema_business(lang), schema_faq(lang)], img=IMG_HERO) + header(lang, base(other))
-            + hero(lang, h1, fmt(n["hero_sub"]), eyebrow=eb) + services_grid(lang) + why(lang) + how(lang) + local_block(lang) + areas(lang) + faq(lang) + cta(lang)
+            + hero(lang, h1, fmt(n["hero_sub"]), eyebrow=eb) + services_grid(lang) + why(lang) + how(lang) + prices(lang) + local_block(lang) + areas(lang) + faq(lang) + cta(lang)
             + "</main>" + footer(lang))
     write(p, page); PAGES.append(p)
 
