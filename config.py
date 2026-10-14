@@ -17,6 +17,7 @@ SITE = {
     "social": [
         ("Facebook", "https://www.facebook.com/kendallacrepairs"),
         ("Instagram", "https://www.instagram.com/kendallacrepairsfl"),
+        ("Nextdoor", "https://nextdoor.com/page/kendall-ac-repairs-miami-fl"),
     ],
     "ga4_id": "G-DRFTR128F9",            # ej. "G-XXXXXXXXXX" (Google Analytics)
     "gsc_verification": "",    # código de verificación de Google Search Console (etiqueta HTML)
