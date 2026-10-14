@@ -1,7 +1,7 @@
 """Genera la web completa en la carpeta /sitio a partir de config.py"""
 import os, json, shutil, datetime, html, re
 from urllib.parse import quote_plus
-from config import SITE, NICHE, AREAS, SERVICES
+from config import SITE, NICHE, AREAS, SERVICES, AUTHOR, ABOUT
 from contenido import SVC_EXTRA, AREA_EXTRA, AREA_TIP, AREA_LOCAL
 import glob
 
@@ -20,7 +20,7 @@ def load_articles():
     arts.sort(key=lambda a: a[2], reverse=True)
     return arts
 
-SITE_VERSION = "9"
+SITE_VERSION = "10"
 ARTICLES = load_articles()
 
 OUT = os.path.join(os.path.dirname(__file__), "sitio")
@@ -92,7 +92,7 @@ def fmt(t, **kw):
 UI["es"].update({
     "topbar": "Se habla español · Lunes a domingo, 7am – 10pm",
     "tagline": "Reparación de aire acondicionado",
-    "nav": [("Servicios", "#servicios"), ("Zonas", "#zonas"), ("Consejos", "blog/")],
+    "nav": [("Servicios", "#servicios"), ("Zonas", "#zonas"), ("Consejos", "blog/"), ("Nosotros", "quienes-somos/")],
     "call_today": "Llama hoy",
     "form_title": "Solicita servicio", "form_sub": "Te llamamos en minutos para coordinar la visita.",
     "trust_icons": [("shield", "Técnicos licenciados", "Contratistas con licencia de Florida y seguro"),
@@ -115,7 +115,7 @@ UI["es"].update({
 UI["en"].update({
     "topbar": "Se habla español · Monday to Sunday, 7am – 10pm",
     "tagline": "Air conditioning repair",
-    "nav": [("Services", "#servicios"), ("Areas", "#zonas"), ("Tips", "blog/")],
+    "nav": [("Services", "#servicios"), ("Areas", "#zonas"), ("Tips", "blog/"), ("About", "about-us/")],
     "call_today": "Call today",
     "form_title": "Request service", "form_sub": "We'll call you back within minutes to schedule a visit.",
     "trust_icons": [("shield", "Licensed technicians", "Florida-licensed and insured contractors"),
@@ -641,7 +641,7 @@ def footer(lang):
 <div><h2 class="fh">{u["contact_t"]}</h2><ul><li><a href="tel:{S['phone_tel']}">{S['phone_display']}</a></li>
 <li><a href="mailto:{S['email']}">{S['email']}</a></li><li><a href="{blog_path(lang)}">{'Consejos de AC' if lang == 'es' else 'AC tips'}</a></li><li>{u['hours']}</li><li>{S['city']}, {S['county']} County, {S['state']}</li></ul></div>
 </div>
-<div class="legalrow"><a href="{LEGAL[lang]['privacy']}">{u['privacy']}</a><a href="{LEGAL[lang]['terms']}">{u['terms']}</a>
+<div class="legalrow"><a href="{ABOUT[lang]['slug']}">{ABOUT[lang]['title']}</a><a href="{LEGAL[lang]['privacy']}">{u['privacy']}</a><a href="{LEGAL[lang]['terms']}">{u['terms']}</a>
 <span>© {datetime.date.today().year} {S['operator']}</span></div>
 </div></footer>
 <div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']}</a><a class="f" href="#form">{icon('check', 20)} {u['book']}</a></div>
@@ -752,17 +752,62 @@ def article_page(lang, art):
     upd = ("Publicado: " if lang == "es" else "Published: ") + art[2]
     schema = {"@context": "https://schema.org", "@type": "Article", "headline": a["title"], "description": a["desc"], "image": img,
               "datePublished": art[2], "dateModified": art[2], "inLanguage": lang, "mainEntityOfPage": S["domain"] + p,
-              "author": {"@type": "Organization", "name": S["brand"]}, "publisher": {"@type": "Organization", "name": S["brand"]}}
+              "author": author_schema(), "publisher": {"@type": "Organization", "name": S["brand"], "url": S["domain"]}}
     bc = crumbs_schema(lang, [(u["home"], base(lang)), (t_blog, blog_path(lang)), (a["title"], p)])
     page = (head(lang, f"{a['title']} | {S['brand']}", a["desc"], p, alt, [schema, bc], img=img) + header(lang, alt)
             + f'<main><section class="blk"><div class="wrap prose"><div class="crumb" style="color:var(--mut)"><a href="{base(lang)}" style="color:var(--navy2)">{u["home"]}</a> › <a href="{blog_path(lang)}" style="color:var(--navy2)">{t_blog}</a></div>'
-            + f'<h1 class="t" style="font-size:42px">{E(a["title"])}</h1><p style="color:var(--mut);font-size:14px">{upd} · {S["brand"]}</p>'
+            + f'<h1 class="t" style="font-size:42px">{E(a["title"])}</h1><p style="color:var(--mut);font-size:14px">{upd} · {"Por" if lang == "es" else "By"} <a href="{ABOUT[lang]["slug"]}" style="color:var(--navy2)">{E(AUTHOR["name"])}</a></p>'
             + f'<div class="photo" style="border-radius:6px;overflow:hidden;aspect-ratio:16/9;background:#D9E1EA;margin:18px 0 24px">{picture(img, img_alt(img, lang, a["title"]), 1200, 675, lazy=False, style="width:100%;height:100%;object-fit:cover")}</div>'
-            + body
+            + body + author_box(lang)
             + f'<div style="background:var(--navy);color:#fff;border-radius:6px;padding:22px;margin-top:30px"><b style="font-size:20px">{u["cta_t"]}</b><p style="margin:6px 0 14px;color:#C9D4E3">{u["cta_s"]}</p>'
             + f'<a class="btn b-call" href="tel:{S["phone_tel"]}">{icon("phone", 20)} {u["call"]} {S["phone_display"]}</a></div></div></section>'
             + f'<section class="blk soft"><div class="wrap"><div class="head"><h2 class="t">{"Servicios relacionados" if lang == "es" else "Related services"}</h2></div><div class="grid g3">{rel}</div></div></section>'
             + (f'<section class="blk"><div class="wrap"><div class="head"><h2 class="t">{"Más consejos" if lang == "es" else "More tips"}</h2></div><div class="grid g3">{blog_list(lang, skip=art[0])}</div></div></section>' if len(ARTICLES) > 1 else "")
+            + cta(lang) + "</main>" + footer(lang))
+    write(p, page); PAGES.append(p)
+
+def author_schema():
+    a = {"@type": AUTHOR["type"], "name": AUTHOR["name"], "url": S["domain"] + ABOUT["es"]["slug"]}
+    if AUTHOR.get("photo"): a["image"] = S["domain"] + AUTHOR["photo"]
+    if AUTHOR.get("links"): a["sameAs"] = AUTHOR["links"]
+    if AUTHOR["type"] == "Person" and AUTHOR.get("license"): a["hasCredential"] = {"@type": "EducationalOccupationalCredential", "name": "Florida HVAC license " + AUTHOR["license"]}
+    return a
+
+def author_box(lang):
+    au, ab = AUTHOR[lang], ABOUT[lang]
+    photo = (f'<img src="{AUTHOR["photo"]}" alt="{E(AUTHOR["name"])}" width="64" height="64" loading="lazy" style="border-radius:50%;object-fit:cover;flex:none">'
+             if AUTHOR.get("photo") else f'<span class="ibox" style="flex:none">{icon("shield", 26)}</span>')
+    lic = f' · {"Licencia" if lang == "es" else "License"} {E(AUTHOR["license"])}' if AUTHOR.get("license") else ""
+    return (f'<div class="author" style="display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:16px;margin-top:28px">{photo}'
+            f'<div><b>{E(AUTHOR["name"])}</b><span style="display:block;color:var(--mut);font-size:14px">{E(au["role"])}{lic}</span>'
+            f'<p style="margin:8px 0 6px;font-size:15px">{E(au["bio"])}</p><a href="{ab["slug"]}" style="color:var(--navy2);font-weight:600">{E(ab["title"])} {icon("arrow", 14)}</a></div></div>')
+
+def about_page(lang):
+    other = "en" if lang == "es" else "es"
+    ab, u = ABOUT[lang], UI[lang]
+    p, alt = ab["slug"], ABOUT[other]["slug"]
+    kw = dict(brand=S["brand"], city=S["city"], county=S["county"] + " County", operator=S["operator"], email=S["email"], phone=S["phone_display"])
+    zone = ", ".join(x[0] for x in AREAS)
+    zips = ", ".join(sorted({x[2] for x in AREAS if x[2]}))
+    zh, zt = (("Zona que atendemos", f"Atendemos {S['city']} y sus barrios: {zone}. Códigos postales: {zips}. Si vives cerca pero no ves tu comunidad, llámanos igual: casi siempre podemos coordinar un técnico.")
+              if lang == "es" else ("Area we serve", f"We serve {S['city']} and its neighborhoods: {zone}. ZIP codes: {zips}. If you live nearby but don't see your community, call anyway: we can almost always coordinate a technician."))
+    nh, nt = (("Lo que no hacemos", "No cobramos por la llamada ni por la coordinación, no vendemos tus datos y no enviamos técnicos sin licencia. Si no podemos ayudarte en tu zona o con tu equipo, te lo decimos en la misma llamada.")
+              if lang == "es" else ("What we don't do", "We don't charge for the call or the coordination, we don't sell your data and we never send unlicensed technicians. If we can't help in your area or with your unit, we tell you on the same call."))
+    secs = list(ab["sections"]) + [(zh, zt), (nh, nt)]
+    body = "".join(f"<h2>{E(fmt(h, **kw))}</h2><p>{E(fmt(x, **kw))}</p>" for h, x in secs)
+    desc = fmt(ab["intro"], **kw)
+    org = {"@context": "https://schema.org", "@type": "AboutPage", "name": ab["title"], "url": S["domain"] + p, "inLanguage": lang,
+           "about": {"@type": "HVACBusiness", "name": S["brand"], "url": S["domain"] + base(lang), "telephone": S["phone_tel"], "email": S["email"],
+                     "parentOrganization": {"@type": "Organization", "name": S["operator"]},
+                     "areaServed": {"@type": "City", "name": f"{S['city']}, {S['state']}"}},
+           "author": author_schema()}
+    bc = crumbs_schema(lang, [(u["home"], base(lang)), (ab["title"], p)])
+    page = (head(lang, f"{ab['title']} | {S['brand']}", desc[:155], p, alt, [org, bc]) + header(lang, alt)
+            + f'<main><section class="blk"><div class="wrap prose"><div class="crumb" style="color:var(--mut)"><a href="{base(lang)}" style="color:var(--navy2)">{u["home"]}</a> › {E(ab["title"])}</div>'
+            + f'<h1 class="t" style="font-size:42px">{E(ab["h1"])}</h1><p style="font-size:19px">{E(desc)}</p>{body}'
+            + f'<h2>{E(ab["author_t"])}</h2>{author_box(lang)}'
+            + f'<div style="background:var(--navy);color:#fff;border-radius:6px;padding:22px;margin-top:30px"><b style="font-size:20px">{E(ab["cta"])}</b><p style="margin:12px 0 0">'
+            + f'<a class="btn b-call" href="tel:{S["phone_tel"]}">{icon("phone", 20)} {u["call"]} {S["phone_display"]}</a></p></div></div></section>'
             + cta(lang) + "</main>" + footer(lang))
     write(p, page); PAGES.append(p)
 
@@ -1009,6 +1054,7 @@ if __name__ == "__main__":
         for art in ARTICLES:
             article_page(lang, art)
         legal_pages(lang)
+        about_page(lang)
     extras()
     st = os.path.join(ROOT, "static")
     if os.path.isdir(st): shutil.copytree(st, OUT, dirs_exist_ok=True)
