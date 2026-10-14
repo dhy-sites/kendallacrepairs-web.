@@ -239,7 +239,7 @@ def brand_html(): return E(S['brand']).replace(' AC ', ' <span style="color:var(
 
 CSS = """
 :root{--navy:#0B2545;--navy2:#13315C;--red:#C8102E;--red2:#A50D26;--ink:#1B2430;--mut:#5B6675;--line:#E3E7EC;--soft:#F3F5F8}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
+*{box-sizing:border-box}html{scroll-behavior:auto}
 body{margin:0;font-family:"Source Sans 3",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:17px;color:var(--ink);background:#fff;line-height:1.6;padding-bottom:62px}
 h1,h2,h3,.cond{font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;font-weight:700;line-height:1.08;letter-spacing:.2px}
 a{color:var(--navy2)}img{max-width:100%;display:block}
