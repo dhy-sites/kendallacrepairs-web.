@@ -7,7 +7,13 @@ LOGO = '/home/claude/logo/logo-horizontal.png'
 fs = open(os.path.join(SP, 'orden.txt')).read().split('\n')
 F = lambda n: os.path.join(SP, fs[n - 1])
 
-def save(im, name, w):
+NOMBRES = {"portada": "reparacion-aire-acondicionado-kendall", "por-que-elegirnos": "tecnico-aire-acondicionado-kendall-miami",
+           "barrio-calle": "calle-residencial-kendall-aire-acondicionado", "barrio-townhouses": "townhouses-condensadores-ac-miami-dade",
+           "barrio-patio": "mini-split-patio-casa-miami", "manometros": "revision-presion-refrigerante-ac-miami"}
+
+def save(im, key, w):
+    """Guarda 3 versiones: JPG (respaldo y redes), WebP grande y WebP de 800 px (celulares)."""
+    name = NOMBRES.get(key, key + "-kendall")
     im = im.convert('RGB')
     if im.width > w:
         im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
@@ -17,7 +23,10 @@ def save(im, name, w):
         im.save(p, 'JPEG', quality=q, optimize=True, progressive=True)
         if os.path.getsize(p) < 260_000 or q <= 60: break
         q -= 4
-    print(name, im.size, os.path.getsize(p) // 1024, 'KB', 'q', q)
+    im.save(f'{OUT}/{name}.webp', 'WEBP', quality=78, method=6)
+    sm = im.resize((800, round(im.height * 800 / im.width)), Image.LANCZOS)
+    sm.save(f'{OUT}/{name}-800.webp', 'WEBP', quality=76, method=6)
+    print(f"{name:45s} {im.size} jpg {os.path.getsize(p)//1024}KB webp {os.path.getsize(f'{OUT}/{name}.webp')//1024}KB 800 {os.path.getsize(f'{OUT}/{name}-800.webp')//1024}KB")
 
 def crop_ratio(im, r, ybias=0.4):
     W, H = im.size
@@ -43,6 +52,7 @@ def inpaint(im, shapes):
     return Image.fromarray(cv2.cvtColor(a, cv2.COLOR_BGR2RGB))
 
 os.makedirs(OUT, exist_ok=True)
+for f in os.listdir(OUT): os.remove(os.path.join(OUT, f))
 
 # Portada: la camioneta ya editada (logo real + luz corregida)
 save(Image.open(os.path.join(SP, 'hero-van.webp')), 'portada', 1600)

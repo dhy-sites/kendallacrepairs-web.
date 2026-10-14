@@ -140,12 +140,67 @@ def px(i, w=1800):
     # str = foto propia en static/img (versión 9); int = foto de Pexels
     if isinstance(i, str): return f"{SITE['domain']}/img/{i}.jpg"
     return f"https://images.pexels.com/photos/{i}/pexels-photo-{i}.jpeg?auto=compress&cs=tinysrgb&w={w}"
-IMG_HERO = px("portada")
-SVC_IMG = {s: s for s in ["ac-no-enfria", "ac-gotea-agua", "ac-hace-ruido", "ac-no-enciende", "mantenimiento-ac",
-                          "instalacion-ac", "recarga-gas-ac", "limpieza-ductos", "termostato", "mini-split"]}
-AREA_POOL = ["barrio-calle", "barrio-townhouses", "barrio-patio", "manometros", "mantenimiento-ac", "ac-hace-ruido",
-             "ac-no-enciende", "instalacion-ac", "recarga-gas-ac", "portada", "ac-gotea-agua", "ac-no-enfria", "mini-split"]
-IMG_UNIT = px("por-que-elegirnos")
+IMG_HERO = px("reparacion-aire-acondicionado-kendall")
+SVC_IMG = {s: s + "-kendall" for s in ["ac-no-enfria", "ac-gotea-agua", "ac-hace-ruido", "ac-no-enciende", "mantenimiento-ac",
+                                       "instalacion-ac", "recarga-gas-ac", "limpieza-ductos", "termostato", "mini-split"]}
+AREA_POOL = ["calle-residencial-kendall-aire-acondicionado", "townhouses-condensadores-ac-miami-dade", "mini-split-patio-casa-miami",
+             "revision-presion-refrigerante-ac-miami", "mantenimiento-ac-kendall", "ac-hace-ruido-kendall", "ac-no-enciende-kendall",
+             "instalacion-ac-kendall", "recarga-gas-ac-kendall", "reparacion-aire-acondicionado-kendall", "ac-gotea-agua-kendall",
+             "ac-no-enfria-kendall", "mini-split-kendall"]
+IMG_UNIT = px("tecnico-aire-acondicionado-kendall-miami")
+
+# Texto alternativo de cada foto propia (describe la escena + servicio + zona, sin exagerar)
+IMG_ALT = {
+ "reparacion-aire-acondicionado-kendall": ("Técnico revisando la unidad exterior de aire acondicionado de una casa en Kendall, Miami",
+                                           "Technician checking the outdoor air conditioning unit of a home in Kendall, Miami"),
+ "tecnico-aire-acondicionado-kendall-miami": ("Técnico de aire acondicionado midiendo con multímetro una unidad exterior en Kendall",
+                                              "AC technician testing an outdoor unit with a multimeter in Kendall"),
+ "ac-no-enfria-kendall": ("Técnico midiendo la temperatura del aire en una rejilla de una casa en Kendall porque el AC no enfría",
+                          "Technician measuring vent air temperature in a Kendall home because the AC is not cooling"),
+ "ac-gotea-agua-kendall": ("Técnico destapando el drenaje del manejador de aire que gotea agua en un clóset",
+                           "Technician clearing the condensate drain of a leaking air handler in a closet"),
+ "ac-hace-ruido-kendall": ("Técnico revisando con linterna el motor del ventilador de un AC que hace ruido",
+                           "Technician inspecting the fan motor of a noisy AC with a flashlight"),
+ "ac-no-enciende-kendall": ("Técnico probando con multímetro la caja eléctrica de un aire acondicionado que no enciende",
+                            "Technician testing the disconnect box of an AC that won't turn on with a multimeter"),
+ "mantenimiento-ac-kendall": ("Mantenimiento de aire acondicionado: limpieza del serpentín de la unidad exterior con manguera",
+                              "AC maintenance: rinsing the outdoor condenser coil with a hose"),
+ "instalacion-ac-kendall": ("Dos técnicos instalando una unidad nueva de aire acondicionado junto a una casa en Miami-Dade",
+                            "Two technicians installing a new air conditioning unit beside a Miami-Dade home"),
+ "recarga-gas-ac-kendall": ("Técnico leyendo los manómetros durante la recarga de gas refrigerante de un AC",
+                            "Technician reading gauges while recharging AC refrigerant"),
+ "limpieza-ductos-kendall": ("Técnico con mascarilla limpiando un ducto de aire acondicionado desde el techo",
+                             "Technician with a dust mask cleaning an air duct through a ceiling vent"),
+ "termostato-kendall": ("Técnico ajustando un termostato inteligente en la pared de una casa",
+                        "Technician adjusting a smart thermostat on a home wall"),
+ "mini-split-kendall": ("Técnico limpiando el filtro de un mini split en un dormitorio",
+                        "Technician cleaning the filter of a mini split in a bedroom"),
+ "calle-residencial-kendall-aire-acondicionado": ("Calle residencial con palmas y técnico revisando un aire acondicionado en Kendall",
+                                                  "Residential street with palm trees and a technician checking an AC in Kendall"),
+ "townhouses-condensadores-ac-miami-dade": ("Técnico revisando una fila de unidades de aire acondicionado en townhouses de Miami-Dade",
+                                            "Technician servicing a row of AC condensers at Miami-Dade townhouses"),
+ "mini-split-patio-casa-miami": ("Técnico revisando la unidad exterior de un mini split en el patio de una casa con piscina en Miami",
+                                 "Technician servicing a mini split outdoor unit on a Miami home patio with a pool"),
+ "revision-presion-refrigerante-ac-miami": ("Técnico conectando manómetros a una unidad exterior para revisar la presión del refrigerante",
+                                            "Technician connecting gauges to an outdoor unit to check refrigerant pressure"),
+}
+IMG_W = {"reparacion-aire-acondicionado-kendall": 1600, "tecnico-aire-acondicionado-kendall-miami": 1000}
+_LOCAL_RE = re.compile(r"/img/([a-z0-9-]+)\.jpg$")
+def local_name(url): m = _LOCAL_RE.search(url or ""); return m.group(1) if m else None
+def img_alt(url, lang, fallback):
+    n = local_name(url)
+    return IMG_ALT[n][0 if lang == "es" else 1] if n in IMG_ALT else fallback
+def picture(url, alt, w, h, lazy=True, style="", sizes="(max-width: 800px) 100vw, 800px", cls="", high=False):
+    """<picture> con WebP (800 px y grande) y JPG de respaldo para las fotos propias; <img> normal para el resto."""
+    attrs = (f' alt="{E(alt)}" width="{w}" height="{h}"' + (' loading="lazy" decoding="async"' if lazy else "")
+             + (' fetchpriority="high"' if high else "") + (f' style="{style}"' if style else ""))
+    n = local_name(url)
+    if not n: return f'<img src="{E(url)}"{attrs}>' if not cls else f'<img class="{cls}" src="{E(url)}"{attrs}>'
+    base = url[: -len(".jpg")]
+    c = f' class="{cls}"' if cls else ""
+    real_w = IMG_W.get(n, 1200)  # ancho real del archivo grande
+    return (f'<picture{c}><source type="image/webp" srcset="{base}-800.webp 800w, {base}.webp {real_w}w" sizes="{sizes}">'
+            f'<img src="{url}"{attrs}></picture>')
 
 # ---------- íconos (trazos simples, sin emojis) ----------
 ICON_PATHS = {
@@ -209,8 +264,8 @@ a{color:var(--navy2)}img{max-width:100%;display:block}
 .callbtn:hover{background:var(--red2)}
 /* hero */
 .hero{position:relative;color:#fff;background:var(--navy) center/cover no-repeat}
-.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,26,50,.94) 0%,rgba(8,26,50,.82) 45%,rgba(8,26,50,.45) 100%)}
-.hero .wrap{position:relative;display:grid;grid-template-columns:minmax(0,1fr);gap:28px;padding-top:44px;padding-bottom:48px}
+.hero{overflow:hidden}.hbg,.hbg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.hero:before{z-index:1;content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,26,50,.94) 0%,rgba(8,26,50,.82) 45%,rgba(8,26,50,.45) 100%)}
+.hero .wrap{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);gap:28px;padding-top:44px;padding-bottom:48px}
 .crumb{font-size:14px;color:#C9D4E3;margin-bottom:10px}.crumb a{color:#fff}
 .eyebrow{display:inline-block;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:#fff;border-left:3px solid var(--red);padding-left:10px;margin-bottom:14px}
 .hero h1{font-size:40px;margin:0 0 14px;text-transform:uppercase}
@@ -371,13 +426,18 @@ def schema_faq(lang):
                             "acceptedAnswer": {"@type": "Answer", "text": fmt(a)}} for q, a in NICHE[lang]["faq"]]}
 
 ALTS = {}
+PAGE_IMG = {}
 def head(lang, title, desc, path, alt_path, schemas, img=None):
     other = "en" if lang == "es" else "es"
     es_path = path if lang == "es" else alt_path
     ALTS[path] = {"es": es_path, "en": path if lang == "en" else alt_path}
     if len(title) > 62 and title.endswith(" | " + S["brand"]): title = title[: -len(" | " + S["brand"])]
     extra = ""
-    if img: extra += f'<link rel="preload" as="image" href="{img}" fetchpriority="high">\n'
+    if img: PAGE_IMG[path] = img
+    if img and local_name(img):
+        b = img[: -len(".jpg")]
+        extra += f'<link rel="preload" as="image" type="image/webp" imagesrcset="{b}-800.webp 800w, {b}.webp {IMG_W.get(local_name(img), 1200)}w" imagesizes="100vw" fetchpriority="high">\n'
+    elif img: extra += f'<link rel="preload" as="image" href="{img}" fetchpriority="high">\n'
     if S.get("gsc_verification"): extra += f'<meta name="google-site-verification" content="{S["gsc_verification"]}">\n'
     if S.get("ga4_id"):
         extra += (f'<script async src="https://www.googletagmanager.com/gtag/js?id={S["ga4_id"]}"></script>'
@@ -442,7 +502,7 @@ def hero(lang, h1, sub, crumb="", eyebrow=None, img=None):
     u = UI[lang]
     ticks = "".join(f"<li>{icon('check', 18)}{t}</li>" for t in u["trust"][:3])
     eb = f'<span class="eyebrow">{E(eyebrow)}</span>' if eyebrow else ""
-    return f"""<main><section class="hero" style="background-image:url('{img or IMG_HERO}')"><div class="wrap"><div>{crumb}{eb}
+    return f"""<main><section class="hero">{picture(img or IMG_HERO, img_alt(img or IMG_HERO, lang, ""), 1600, 900, lazy=False, sizes="100vw", cls="hbg", high=True)}<div class="wrap"><div>{crumb}{eb}
 <h1>{E(h1)}</h1><p class="sub">{E(sub)}</p>
 <div class="btns"><a class="btn b-call" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']} {S['phone_display']}</a>
 <a class="btn b-ghost" href="{wa_link(lang)}" target="_blank" rel="noopener">{icon('wa', 20)} {u['wa']}</a></div>
@@ -479,7 +539,7 @@ def why(lang):
     u = UI[lang]
     lis = "".join(f"<li>{icon('check', 20)}<span>{x}</span></li>" for x in u["why_list"])
     return f"""<section class="blk soft"><div class="wrap split">
-<div class="photo"><img src="{IMG_UNIT}" alt="{'Técnico reparando una unidad de aire acondicionado' if lang=='es' else 'Technician repairing an air conditioning unit'}" loading="lazy" width="1000" height="750"></div>
+<div class="photo">{picture(IMG_UNIT, img_alt(IMG_UNIT, lang, ""), 1000, 750, sizes="(max-width: 900px) 100vw, 560px")}</div>
 <div><p class="kicker">{S['brand']}</p><h2 class="t">{u['why_t']}</h2><p>{u['why_p']}</p><ul class="checks">{lis}</ul>
 <p class="honest">{fmt(u['disclaimer'])}</p>
 <div class="btns" style="margin-top:18px"><a class="btn b-call" href="tel:{S['phone_tel']}">{icon('phone', 20)} {S['phone_display']}</a></div></div>
@@ -603,8 +663,8 @@ def blog_list(lang, skip=None):
         if art[0] == skip: continue
         a = art[5] if lang == "es" else art[6]
         out += (f'<a class="svc" href="{blog_path(lang, art)}"><div class="photo" style="border-radius:4px;overflow:hidden;aspect-ratio:16/9;background:#D9E1EA;margin-bottom:14px">'
-                f'<img src="{art_img(art, 700)}" alt="{E(a["title"])}" loading="lazy" width="700" height="394" style="width:100%;height:100%;object-fit:cover"></div>'
-                f'<h3>{E(a["title"])}</h3><p>{E(a["desc"])}</p><span class="more">{"Leer" if lang == "es" else "Read"} {icon("arrow", 16)}</span></a>')
+                + picture(art_img(art, 700), img_alt(art_img(art, 700), lang, a["title"]), 1200, 675, style="width:100%;height:100%;object-fit:cover", sizes="(max-width: 800px) 100vw, 400px") + '</div>'
+                + f'<h3>{E(a["title"])}</h3><p>{E(a["desc"])}</p><span class="more">{"Leer" if lang == "es" else "Read"} {icon("arrow", 16)}</span></a>')
     return out
 
 def blog_index(lang):
@@ -653,7 +713,7 @@ def article_page(lang, art):
     page = (head(lang, f"{a['title']} | {S['brand']}", a["desc"], p, alt, [schema, bc], img=img) + header(lang, alt)
             + f'<main><section class="blk"><div class="wrap prose"><div class="crumb" style="color:var(--mut)"><a href="{base(lang)}" style="color:var(--navy2)">{u["home"]}</a> › <a href="{blog_path(lang)}" style="color:var(--navy2)">{t_blog}</a></div>'
             + f'<h1 class="t" style="font-size:42px">{E(a["title"])}</h1><p style="color:var(--mut);font-size:14px">{upd} · {S["brand"]}</p>'
-            + f'<div class="photo" style="border-radius:6px;overflow:hidden;aspect-ratio:16/9;background:#D9E1EA;margin:18px 0 24px"><img src="{img}" alt="{E(a["title"])}" width="1200" height="675" style="width:100%;height:100%;object-fit:cover"></div>'
+            + f'<div class="photo" style="border-radius:6px;overflow:hidden;aspect-ratio:16/9;background:#D9E1EA;margin:18px 0 24px">{picture(img, img_alt(img, lang, a["title"]), 1200, 675, lazy=False, style="width:100%;height:100%;object-fit:cover")}</div>'
             + body
             + f'<div style="background:var(--navy);color:#fff;border-radius:6px;padding:22px;margin-top:30px"><b style="font-size:20px">{u["cta_t"]}</b><p style="margin:6px 0 14px;color:#C9D4E3">{u["cta_s"]}</p>'
             + f'<a class="btn b-call" href="tel:{S["phone_tel"]}">{icon("phone", 20)} {u["call"]} {S["phone_display"]}</a></div></div></section>'
@@ -795,7 +855,7 @@ def service_page(lang, sv):
     body = f"""<section class="blk"><div class="wrap split">
 <div><p class="kicker">{S['city']}, FL</p><h2 class="t">{E(d['name'])}</h2><p>{E(d['p1'])}</p><p>{E(d['p2'])}</p>
 <div class="btns" style="margin-top:18px"><a class="btn b-call" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']} {S['phone_display']}</a></div></div>
-<div><div class="photo" style="border-radius:6px;overflow:hidden;aspect-ratio:16/10;background:#D9E1EA;margin-bottom:18px"><img src="{px(SVC_IMG[sv[0]], 1000)}" alt="{E(d['name'])}" loading="lazy" width="1000" height="625" style="width:100%;height:100%;object-fit:cover"></div>
+<div><div class="photo" style="border-radius:6px;overflow:hidden;aspect-ratio:16/10;background:#D9E1EA;margin-bottom:18px">{picture(px(SVC_IMG[sv[0]]), img_alt(px(SVC_IMG[sv[0]]), lang, d['name']), 1200, 675, style="width:100%;height:100%;object-fit:cover", sizes="(max-width: 900px) 100vw, 400px")}</div>
 <div style="background:var(--soft);border-radius:6px;padding:26px"><h3 style="font-size:24px;color:var(--navy);margin:0;text-transform:uppercase">{u['signs_t']}</h3><ul class="checks">{lis}</ul></div></div>
 </div></section>"""
     bc = crumbs_schema(lang, [(u["home"], base(lang)), (d["name"], p)])
@@ -868,8 +928,9 @@ def extras():
         a = ALTS.get(p, {})
         return "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{S["domain"]}{a[l]}"/>' for l in ("es", "en") if l in a) + \
                (f'<xhtml:link rel="alternate" hreflang="x-default" href="{S["domain"]}{a["es"]}"/>' if "es" in a else "")
-    urls = "".join(f"<url><loc>{S['domain']}{p}</loc><lastmod>{TODAY}</lastmod>{alt_links(p)}</url>\n" for p in PAGES)
-    write("sitemap.xml", f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n{urls}</urlset>\n')
+    urls = "".join(f"<url><loc>{S['domain']}{p}</loc><lastmod>{TODAY}</lastmod>{alt_links(p)}"
+                   + (f"<image:image><image:loc>{PAGE_IMG[p]}</image:loc></image:image>" if p in PAGE_IMG else "") + "</url>\n" for p in PAGES)
+    write("sitemap.xml", f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n{urls}</urlset>\n')
     # Netlify lee _headers en despliegues por arrastre (netlify.toml no se usa en ese modo)
     write("_headers", """/*
   X-Content-Type-Options: nosniff
