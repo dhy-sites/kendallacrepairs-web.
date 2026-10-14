@@ -43,7 +43,7 @@ UI = {
         "areas_t": "Zonas que cubrimos", "areas_s": "Servicio en {city} y comunidades cercanas.",
         "faq_t": "Preguntas frecuentes",
         "cta_t": "¿Tu AC está fallando? No esperes a mañana.",
-        "trust": ["Atendemos de 7 am a 10 pm, los 7 días", "Diagnóstico desde $75 y precio claro antes de empezar", "Al llamar te atiende una persona, en español", "Técnicos con licencia de Florida"], "book": "Pedir cita",
+        "trust": ["Atendemos de 7 am a 10 pm, los 7 días", "Diagnóstico de referencia: $75 – $150, precio claro antes de empezar", "Al llamar te atiende una persona, en español", "Técnicos con licencia de Florida"], "book": "Pedir cita",
         "disclaimer": "{brand} es un servicio de referidos operado por {op}. Los trabajos los realizan contratistas independientes con licencia en Florida.",
         "privacy": "Privacidad", "terms": "Términos", "areas_word": "Zonas",
         "area_h1": "{service} en {area}", "area_more": "Otras zonas cercanas",
@@ -64,7 +64,7 @@ UI = {
         "areas_t": "Areas we serve", "areas_s": "Service in {city} and nearby communities.",
         "faq_t": "Frequently asked questions",
         "cta_t": "AC acting up? Don't wait until tomorrow.",
-        "trust": ["Open 7 am to 10 pm, 7 days a week", "Diagnostic from $75, clear price up front", "A real person answers, in English or Spanish", "Florida-licensed technicians"], "book": "Book a visit",
+        "trust": ["Open 7 am to 10 pm, 7 days a week", "Reference diagnostic: $75 – $150, clear price up front", "A real person answers, in English or Spanish", "Florida-licensed technicians"], "book": "Book a visit",
         "disclaimer": "{brand} is a referral service operated by {op}. All work is performed by independent Florida-licensed contractors.",
         "privacy": "Privacy", "terms": "Terms", "areas_word": "Areas",
         "area_h1": "{service} in {area}", "area_more": "Other nearby areas",
@@ -94,7 +94,7 @@ UI["es"].update({
     "tagline": "Reparación de aire acondicionado",
     "nav": [("Servicios", "#servicios"), ("Zonas", "#zonas"), ("Consejos", "blog/"), ("Nosotros", "quienes-somos/")],
     "call_today": "Llama hoy",
-    "form_title": "Solicita servicio", "form_sub": "Te llamamos en minutos para coordinar la visita.",
+    "form_title": "Solicita servicio", "form_sub": "Te llamamos para coordinar la visita, de 7am a 10pm.",
     "trust_icons": [("shield", "Técnicos licenciados", "Contratistas con licencia de Florida y seguro"),
                     ("clock", "Servicio el mismo día", "Según disponibilidad en tu zona"),
                     ("tag", "Precio antes de empezar", "Sin sorpresas: tú apruebas el trabajo"),
@@ -117,7 +117,7 @@ UI["en"].update({
     "tagline": "Air conditioning repair",
     "nav": [("Services", "#servicios"), ("Areas", "#zonas"), ("Tips", "blog/"), ("About", "about-us/")],
     "call_today": "Call today",
-    "form_title": "Request service", "form_sub": "We'll call you back within minutes to schedule a visit.",
+    "form_title": "Request service", "form_sub": "We'll call you back to schedule a visit, 7am to 10pm.",
     "trust_icons": [("shield", "Licensed technicians", "Florida-licensed and insured contractors"),
                     ("clock", "Same-day service", "Based on availability in your area"),
                     ("tag", "Price before work starts", "No surprises: you approve the job"),
@@ -279,6 +279,7 @@ a{color:var(--navy2)}img{max-width:100%;display:block}
 .b-ghost{border-color:#fff;color:#fff;background:transparent}.b-ghost:hover{background:#fff;color:var(--navy)}
 .b-navy{background:var(--navy);color:#fff}
 .hero ul.ticks{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:8px;font-size:16px}
+.hero p.zones{margin:16px 0 0;font-size:15px;color:#C9D6E6;display:flex;gap:6px;align-items:flex-start}.hero p.zones .ic{flex:none;margin-top:3px}
 .hero ul.ticks li{display:flex;gap:8px;align-items:center}.hero ul.ticks .ic{color:#7FD1A0}
 /* formulario */
 .card-form{background:#fff;color:var(--ink);border-radius:6px;padding:24px;border-top:5px solid var(--red);box-shadow:0 18px 40px rgba(0,0,0,.25)}
@@ -506,10 +507,12 @@ def hero(lang, h1, sub, crumb="", eyebrow=None, img=None):
     u = UI[lang]
     ticks = "".join(f"<li>{icon('check', 18)}{t}</li>" for t in u["trust"][:3])
     eb = f'<span class="eyebrow">{E(eyebrow)}</span>' if eyebrow else ""
+    zl = " · ".join(x[0] for x in AREAS[:4])
+    zones = f'<p class="zones">{icon("pin", 16)}<span>{zl} {"y todo" if lang == "es" else "and all of"} {S["city"]}</span></p>'
     return f"""<main><section class="hero">{picture(img or IMG_HERO, img_alt(img or IMG_HERO, lang, ""), 1600, 900, lazy=False, sizes="100vw", cls="hbg", high=True)}<div class="wrap"><div>{crumb}{eb}
 <h1>{E(h1)}</h1><p class="sub">{E(sub)}</p>
 <div class="btns"><a class="btn b-call" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']} {S['phone_display']}</a></div>
-<ul class="ticks">{ticks}</ul></div>{form(lang)}</div></section>
+<ul class="ticks">{ticks}</ul>{zones}</div>{form(lang)}</div></section>
 <div class="trust"><div class="wrap">{''.join(f'<div>{icon(i, 28)}<p style="margin:0"><b>{t}</b><span>{d}</span></p></div>' for i, t, d in u['trust_icons'])}</div></div>"""
 
 SHORT = {

@@ -5,8 +5,8 @@
 SITE = {
     "brand": "Kendall AC Repairs",
     "domain": "https://kendallacrepairs.com",
-    "phone_display": "(305) 306-4511",
-    "phone_tel": "+13053064511",
+    "phone_display": "(305) 363-7976",
+    "phone_tel": "+13053637976",
     "email": "kendallacrepairs@gmail.com",
     "operator": "DHY Solutions LLC",
     "city": "Kendall",
@@ -27,7 +27,7 @@ NICHE = {
         "service_short": "reparación de AC",
         "slug_prefix": "reparacion-aire-acondicionado",
         "hero_q": "¿Tu aire acondicionado no enfría?",
-        "hero_sub": "Te conectamos hoy mismo con un técnico de AC licenciado en {city}. Presupuesto sin compromiso. Se habla español.",
+        "hero_sub": "Técnico con licencia en {city} hoy mismo, según disponibilidad. Te dan el precio antes de empezar. Se habla español.",
         "problems": [
             ("❄️", "El AC no enfría", "Prende pero sale aire caliente o tibio. Puede ser gas, compresor o el condensador."),
             ("💧", "Gotea agua", "Agua en el piso o en el techo. Casi siempre es el drenaje tapado y conviene atenderlo rápido."),
@@ -44,6 +44,7 @@ NICHE = {
             ("¿Trabajan con todas las marcas?", "Sí: Carrier, Trane, Lennox, Goodman, Rheem, mini splits y más."),
             ("¿Qué zonas cubren?", "Todo {city} y alrededores: {areas}."),
             ("¿Atienden emergencias de AC en {city}?", "Sí, de lunes a domingo de 7am a 10pm. Si tu AC se apaga en pleno calor, llámanos y te conectamos con el técnico disponible más cercano, muchas veces el mismo día."),
+            ("¿Puedo financiar un equipo nuevo?", "Muchos contratistas ofrecen financiamiento para equipos nuevos. Pregúntalo al llamar y te decimos qué opciones hay."),
             ("¿A qué temperatura conviene poner el termostato en verano?", "El Departamento de Energía de EE. UU. recomienda unos 78 °F cuando estás en casa y subirlo cuando sales. Bajarlo de golpe a 65 °F no enfría más rápido, solo hace trabajar más al equipo."),
             ("¿Qué tamaño de aire acondicionado necesita mi casa?", "Depende de los pies cuadrados, el aislamiento, las ventanas y el sol que recibe la casa. Un técnico licenciado lo calcula; un equipo muy grande o muy pequeño gasta más luz y deja la casa húmeda."),
         ],
@@ -53,7 +54,7 @@ NICHE = {
         "service_short": "AC repair",
         "slug_prefix": "ac-repair",
         "hero_q": "AC not cooling?",
-        "hero_sub": "We connect you today with a licensed AC technician in {city}. No-obligation estimate. Se habla español.",
+        "hero_sub": "A licensed technician in {city} today, based on availability. You get the price before any work starts. Se habla español.",
         "problems": [
             ("❄️", "AC not cooling", "It runs but blows warm air. Could be refrigerant, the compressor or the condenser."),
             ("💧", "Leaking water", "Water on the floor or ceiling. Usually a clogged drain line — fix it fast."),
@@ -70,6 +71,7 @@ NICHE = {
             ("Do you work on all brands?", "Yes: Carrier, Trane, Lennox, Goodman, Rheem, mini splits and more."),
             ("What areas do you cover?", "All of {city} and nearby: {areas}."),
             ("Do you handle AC emergencies in {city}?", "Yes, Monday to Sunday from 7am to 10pm. If your AC quits in the heat, call us and we'll connect you with the nearest available technician, often the same day."),
+            ("Can I finance a new system?", "Many contractors offer financing for new systems. Ask when you call and we'll tell you what options are available."),
             ("What should I set my thermostat to in summer?", "The U.S. Department of Energy suggests about 78 °F when you're home and higher when you're away. Dropping it to 65 °F doesn't cool faster; it just makes the unit work harder."),
             ("What size AC does my home need?", "It depends on square footage, insulation, windows and how much sun the house gets. A licensed technician calculates it; a unit that's too big or too small uses more power and leaves the house humid."),
         ],
@@ -254,11 +256,11 @@ AUTHOR = {
     "links": [],                     # perfiles públicos de la misma persona/marca: LinkedIn, Facebook, Google
     "es": {
         "role": "Coordinación de servicio de aire acondicionado en Kendall",
-        "bio": "Coordinamos reparaciones de aire acondicionado en Kendall y conectamos a cada vecino con un técnico con licencia de Florida. Nuestros consejos salen de los problemas que más vemos en casas del sur de la Florida: drenajes tapados, pérdida de gas y equipos que no dan abasto con la humedad.",
+        "bio": "Coordinamos reparaciones de aire acondicionado en Kendall y conectamos a cada vecino con un técnico con licencia de Florida. Nuestros consejos se basan en los problemas más comunes de los equipos en casas del sur de la Florida: drenajes tapados, pérdida de gas y equipos que no dan abasto con la humedad.",
     },
     "en": {
         "role": "AC service coordination in Kendall",
-        "bio": "We coordinate air conditioning repairs in Kendall and connect each neighbor with a Florida-licensed technician. Our tips come from the problems we see most in South Florida homes: clogged drain lines, refrigerant loss and units that can't keep up with the humidity.",
+        "bio": "We coordinate air conditioning repairs in Kendall and connect each neighbor with a Florida-licensed technician. Our tips are based on the most common problems with units in South Florida homes: clogged drain lines, refrigerant loss and units that can't keep up with the humidity.",
     },
 }
 
@@ -271,7 +273,7 @@ ABOUT = {
             ("Qué hacemos", "Cuando llamas, una persona te atiende en español o inglés, entiende qué le pasa a tu equipo y coordina la visita con un técnico licenciado de tu zona, muchas veces el mismo día. Tú recibes el precio antes de aprobar cualquier trabajo."),
             ("Cómo elegimos a los técnicos", "Solo trabajamos con contratistas de aire acondicionado con licencia activa del Estado de Florida y seguro de responsabilidad. Revisamos su licencia, sus reseñas y su tiempo de respuesta antes de enviarles un solo cliente, y los sacamos del sistema si no cumplen."),
             ("Por qué solo {city}", "Conocer la zona importa: las casas de los años 60 de Westchester no tienen los mismos problemas que los townhouses de The Hammocks o los condominios de Dadeland. Trabajar en una sola zona nos deja conocer cada barrio, sus comunidades y sus equipos más comunes."),
-            ("Nuestros consejos", "Los artículos de la sección Consejos los escribe el equipo a partir de las averías reales que vemos cada semana, y se revisan con los técnicos con los que trabajamos. Si algo cambia (precios, permisos del condado, temporada de huracanes), lo actualizamos."),
+            ("Nuestros consejos", "Los artículos de la sección Consejos los escribe el equipo a partir de las averías más comunes de los aires acondicionados en el sur de la Florida y de fuentes confiables (fabricantes, el Departamento de Energía y el condado). Si algo cambia (precios, permisos del condado, temporada de huracanes), lo actualizamos."),
             ("Quién opera el servicio", "{brand} es operado por {operator}, una empresa registrada en Florida con sede en el área de Miami. Puedes escribirnos a {email} o llamar al {phone}."),
         ],
         "author_t": "Quién escribe", "cta": "¿Tu AC tiene un problema? Llámanos y te conectamos hoy.",
@@ -284,7 +286,7 @@ ABOUT = {
             ("What we do", "When you call, a real person helps you in English or Spanish, understands what's wrong with your unit and schedules a visit with a licensed technician in your area, often the same day. You get the price before approving any work."),
             ("How we choose technicians", "We only work with air conditioning contractors holding an active Florida state license and liability insurance. We check their license, reviews and response time before sending them a single customer, and we remove them if they fall short."),
             ("Why only {city}", "Knowing the area matters: 1960s homes in Westchester don't have the same problems as townhouses in The Hammocks or condos in Dadeland. Working in one area lets us know each neighborhood, its communities and its most common units."),
-            ("Our tips", "The articles in our Tips section are written by the team based on the real breakdowns we see every week, and reviewed with the technicians we work with. When something changes (prices, county permits, hurricane season), we update them."),
+            ("Our tips", "The articles in our Tips section are written by the team based on the most common AC breakdowns in South Florida and on reliable sources (manufacturers, the Department of Energy and the county). When something changes (prices, county permits, hurricane season), we update them."),
             ("Who runs the service", "{brand} is operated by {operator}, a Florida-registered company based in the Miami area. You can email us at {email} or call {phone}."),
         ],
         "author_t": "Who writes this", "cta": "AC trouble? Call us and we'll connect you today.",
