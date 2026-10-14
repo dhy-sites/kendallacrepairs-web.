@@ -413,6 +413,9 @@ def schema_business(lang):
             "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
             "opens": "07:00", "closes": "22:00"}],
         "priceRange": "$$", "knowsLanguage": ["es", "en"],
+        "hasOfferCatalog": {"@type": "OfferCatalog", "name": UI[lang]["svc_t"],
+            "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": svc(lang, sv)["name"],
+                                 "url": S["domain"] + svc_path(lang, sv)}} for sv in SERVICES]},
     }
 
 def schema_website(lang):
