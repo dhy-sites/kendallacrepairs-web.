@@ -169,6 +169,8 @@ def carrusel(prefix, question, fact_lines, close_lines, cta, lang="es"):
     im.save(f"{prefix}-2.png", "PNG", optimize=True)
     # Lámina 3: cierre con blog + número
     im, d = base_canvas()
+    if TEMA == "halloween":
+        d.rectangle([930, 260, 1030, 340], fill=NAVY)  # quita el murciélago pequeño que choca con el texto
     center(d, 150, read, font(F_JAK, 72, "ExtraBold"), WHITE)
     y = 290
     for ln in close_lines[:2]:
