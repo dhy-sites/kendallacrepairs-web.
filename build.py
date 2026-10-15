@@ -475,7 +475,10 @@ def head(lang, title, desc, path, alt_path, schemas, img=None):
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0B2545">
 <meta name="site-version" content="{SITE_VERSION}">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%230B2545'/%3E%3Ccircle cx='20' cy='20' r='13.2' fill='%23C8102E'/%3E%3Cpath d='M20 20L20.00 8.80M20.00 13.28L17.69 10.52M20.00 13.28L22.31 10.52M20 20L10.30 14.40M14.18 16.64L10.64 17.27M14.18 16.64L12.95 13.26M20 20L10.30 25.60M14.18 23.36L12.95 26.74M14.18 23.36L10.64 22.73M20 20L20.00 31.20M20.00 26.72L22.31 29.48M20.00 26.72L17.69 29.48M20 20L29.70 25.60M25.82 23.36L29.36 22.73M25.82 23.36L27.05 26.74M20 20L29.70 14.40M25.82 16.64L27.05 13.26M25.82 16.64L29.36 17.27' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 {FONTS}
 <style>{CSS}</style>
 {ld}
