@@ -53,10 +53,40 @@ def center(d, y, text, f, fill):
     d.text(((1080 - d.textlength(text, font=f)) / 2, y), text, font=f, fill=fill)
 
 
+TEMA = os.environ.get("TEMA", "")  # "" o "halloween"
+PURPLE = "#6b3fa0"
+
+
+def pumpkin(d, cx, cy, r):
+    d.ellipse([cx - r, cy - r * 0.8, cx + r, cy + r * 0.8], fill=ORANGE)
+    for k in (-0.45, 0, 0.45):
+        d.arc([cx + k * r - r * 0.55, cy - r * 0.8, cx + k * r + r * 0.55, cy + r * 0.8], 0, 360, fill="#d95a12", width=4)
+    d.rectangle([cx - r * 0.08, cy - r * 1.05, cx + r * 0.08, cy - r * 0.7], fill="#2e7d32")
+    e = r * 0.22
+    d.polygon([(cx - r * 0.45, cy - r * 0.05), (cx - r * 0.2, cy - r * 0.05), (cx - r * 0.33, cy - r * 0.35)], fill=NAVY)
+    d.polygon([(cx + r * 0.45, cy - r * 0.05), (cx + r * 0.2, cy - r * 0.05), (cx + r * 0.33, cy - r * 0.35)], fill=NAVY)
+    d.polygon([(cx - r * 0.5, cy + r * 0.2), (cx + r * 0.5, cy + r * 0.2), (cx + r * 0.3, cy + r * 0.5), (cx - r * 0.3, cy + r * 0.5)], fill=NAVY)
+    d.rectangle([cx - r * 0.1, cy + r * 0.2, cx + r * 0.1, cy + r * 0.32], fill=ORANGE)
+
+
+def bat(d, cx, cy, w):
+    h = w * 0.35
+    d.polygon([(cx - w / 2, cy - h * 0.3), (cx - w * 0.25, cy - h), (cx - w * 0.08, cy - h * 0.4), (cx, cy - h * 0.6),
+               (cx + w * 0.08, cy - h * 0.4), (cx + w * 0.25, cy - h), (cx + w / 2, cy - h * 0.3),
+               (cx + w * 0.3, cy), (cx + w * 0.15, cy + h * 0.3), (cx, cy + h * 0.1),
+               (cx - w * 0.15, cy + h * 0.3), (cx - w * 0.3, cy)], fill=PURPLE)
+
+
 def base_canvas():
     im = Image.new("RGB", (1080, 1080), NAVY)
     d = ImageDraw.Draw(im)
     d.rectangle([0, 0, 1080, 18], fill=ORANGE)
+    if TEMA == "halloween":
+        d.rectangle([0, 18, 1080, 30], fill=PURPLE)
+        bat(d, 150, 110, 120)
+        bat(d, 930, 90, 90)
+        bat(d, 980, 300, 70)
+        pumpkin(d, 1018, 938, 38)
     return im, d
 
 
