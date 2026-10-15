@@ -3,6 +3,9 @@
 Cartel simple (un solo cuadro con número):
   python3 cartel-redes.py simple salida.png "TITULAR" "línea 1|línea 2" "Llama ahora"
 
+Cartel con foto de la web (foto arriba, titular y número abajo):
+  python3 cartel-redes.py foto salida.png static/img/ac-no-enfria-kendall.jpg "¿NO ENFRÍA?" "línea 1|línea 2" "Llama ahora"
+
 Carrusel de blog (3 láminas: pregunta / dato / cierre), crea salida-1.png, -2.png, -3.png:
   python3 cartel-redes.py carrusel salida "¿REPARAR O CAMBIAR?" \
       "Si tu equipo tiene más de 12 años|y la reparación pasa de $800...|casi siempre conviene cambiar" \
@@ -180,12 +183,45 @@ def carrusel(prefix, question, fact_lines, close_lines, cta, lang="es"):
     print("ok", prefix + "-1/2/3.png")
 
 
+def foto(out, photo_path, headline, sub_lines, cta):
+    """Foto arriba (recortada a 1080x520), degradado a navy, titular y número abajo."""
+    im, d = base_canvas()
+    ph = Image.open(photo_path).convert("RGB")
+    target = 1080 / 520
+    w, h = ph.size
+    if w / h > target:
+        nw = int(h * target); ph = ph.crop(((w - nw) // 2, 0, (w - nw) // 2 + nw, h))
+    else:
+        nh = int(w / target); ph = ph.crop((0, (h - nh) // 2, w, (h - nh) // 2 + nh))
+    ph = ph.resize((1080, 520), Image.LANCZOS)
+    im.paste(ph, (0, 18))
+    navy = Image.new("RGB", (1080, 200), NAVY)
+    mask = Image.linear_gradient("L").resize((1080, 200))
+    im.paste(Image.composite(navy, im.crop((0, 340, 1080, 540)), mask), (0, 340))
+    d = ImageDraw.Draw(im)
+    if TEMA == "halloween":
+        bat(d, 150, 110, 120); bat(d, 930, 90, 90); pumpkin(d, 1018, 938, 38)
+    hf = fit(d, headline, F_JAK, "ExtraBold", 104, 960, 60)
+    center(d, 560, headline, hf, WHITE)
+    y = 560 + hf.size + 16
+    for line in sub_lines[:2]:
+        center(d, y, line, fit(d, line, F_DM, "Medium", 42, 940), SKY)
+        y += 52
+    phone_box(d, 812)
+    footer(d)
+    im.save(out, "PNG", optimize=True)
+    print("ok", out)
+
+
 if __name__ == "__main__":
     ensure_fonts()
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
     if mode == "simple":
         out, headline, sub, cta = sys.argv[2:6]
         simple(out, headline, sub.split("|"), cta)
+    elif mode == "foto":
+        out, photo_path, headline, sub, cta = sys.argv[2:7]
+        foto(out, photo_path, headline, sub.split("|"), cta)
     elif mode == "carrusel":
         prefix, question, fact, close, cta = sys.argv[2:7]
         lang = sys.argv[7] if len(sys.argv) > 7 else "es"
