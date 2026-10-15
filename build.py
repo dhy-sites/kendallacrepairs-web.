@@ -1050,6 +1050,15 @@ def extras():
   Cache-Control: public, max-age=3600
 """)
     write("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: {S['domain']}/sitemap.xml\n")
+    # Redirecciones 301: versiones anteriores tenían páginas en inglés en la raíz (/ac-repair-tamiami);
+    # Google aún las muestra. Se envían a su dirección actual /en/... (solo si la raíz no tiene esa página).
+    en_dir = os.path.join(OUT, "en")
+    reglas = []
+    for slug in sorted(os.listdir(en_dir)) if os.path.isdir(en_dir) else []:
+        if slug in ("blog", "index.html") or not os.path.isdir(os.path.join(en_dir, slug)): continue
+        if os.path.exists(os.path.join(OUT, slug)): continue
+        reglas += [f"/{slug}  /en/{slug}/  301", f"/{slug}/  /en/{slug}/  301"]
+    write("_redirects", "\n".join(reglas) + "\n")
     # ficha de salud: la revisión automática semanal la compara con la web publicada
     write("salud.json", json.dumps({"version": SITE_VERSION, "generada": TODAY, "telefono": S["phone_display"],
                                     "telefono_tel": S["phone_tel"], "paginas": len(PAGES),
