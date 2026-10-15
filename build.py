@@ -152,6 +152,10 @@ IMG_UNIT = px("tecnico-aire-acondicionado-kendall-miami")
 
 # Texto alternativo de cada foto propia (describe la escena + servicio + zona, sin exagerar)
 IMG_ALT = {
+ "calle-kendall-lago": ("Calle residencial de Kendall con palmas reales, casas de una planta y un lago al fondo; unidad de aire acondicionado junto a una casa",
+                        "Residential street in Kendall with royal palms, single-story homes and a lake in the background; AC unit beside a house"),
+ "huracan-condensador-miami": ("Técnico asegurando la unidad exterior de aire acondicionado a su base antes de un huracán en Miami, con paneles en las ventanas",
+                               "Technician securing the outdoor AC unit to its pad before a hurricane in Miami, with shutters on the windows"),
  "reparacion-aire-acondicionado-kendall": ("Técnico revisando la unidad exterior de aire acondicionado de una casa en Kendall, Miami",
                                            "Technician checking the outdoor air conditioning unit of a home in Kendall, Miami"),
  "tecnico-aire-acondicionado-kendall-miami": ("Técnico de aire acondicionado midiendo con multímetro una unidad exterior en Kendall",
