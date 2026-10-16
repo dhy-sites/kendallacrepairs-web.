@@ -20,7 +20,7 @@ def load_articles():
     arts.sort(key=lambda a: a[2], reverse=True)
     return arts
 
-SITE_VERSION = "10"
+SITE_VERSION = "11"
 ARTICLES = load_articles()
 
 OUT = os.path.join(os.path.dirname(__file__), "sitio")
@@ -370,6 +370,13 @@ footer .legalrow a{margin-right:16px;text-decoration:underline}
 /* legal */
 .legal{max-width:760px}.legal h1{color:var(--navy);font-size:40px;text-transform:uppercase}.legal h2{font-size:24px;color:var(--navy);margin-top:28px}
 .center{text-align:center}.center .btns{justify-content:center}
+/* aviso instalar app */
+.appbar{position:fixed;left:12px;right:12px;bottom:66px;z-index:31;display:none;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;box-shadow:0 8px 26px rgba(11,37,69,.22);font-size:15px;line-height:1.3}
+.appbar.on{display:flex}
+.appbar img{width:40px;height:40px;border-radius:9px;flex:none}.appbar b{display:block;color:var(--navy)}.appbar span{color:var(--mut);font-size:13.5px}
+.appbar .ok{margin-left:auto;background:var(--navy);color:#fff;border:0;border-radius:4px;padding:9px 14px;font-weight:700;font-family:inherit;font-size:15px;cursor:pointer;white-space:nowrap}
+.appbar .x{background:none;border:0;color:var(--mut);font-size:22px;line-height:1;padding:4px;cursor:pointer}
+@media(min-width:900px){.appbar{left:auto;right:20px;bottom:20px;max-width:380px}}
 /* barra móvil */
 .bar{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:3fr 2fr;z-index:30;box-shadow:0 -3px 12px rgba(0,0,0,.18)}
 .bar a{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px 6px;color:#fff;font-weight:700;text-decoration:none;font-size:17px;white-space:nowrap}
@@ -479,6 +486,11 @@ def head(lang, title, desc, path, alt_path, schemas, img=None):
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="{'/manifest.webmanifest' if lang == 'es' else '/en/manifest.webmanifest'}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="{E(APP_NAME)}">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 {FONTS}
 <style>{CSS}</style>
 {ld}
@@ -663,7 +675,96 @@ def footer(lang):
 <span>© {datetime.date.today().year} {S['operator']}</span></div>
 </div></footer>
 <div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']}</a><a class="f" href="#form">{icon('check', 20)} {u['book']}</a></div>
+{app_block(lang)}
 </body></html>"""
+
+# ============================================================
+#  APP INSTALABLE (PWA) — versión 11
+#  La web se instala en el teléfono con icono propio. Abre a pantalla completa,
+#  el botón Llamar sigue funcionando y sin internet muestra el teléfono.
+# ============================================================
+APP_NAME = S["brand"].replace(" Repairs", "")  # nombre corto bajo el icono: "Kendall AC"
+APP_TXT = {
+ "es": {"t": "Instala la app de {brand}", "s": "Llama en un toque cuando tu AC falle.", "ok": "Instalar",
+        "ios": "En el iPhone: toca Compartir y luego «Agregar a inicio».", "close": "Cerrar",
+        "off_t": "Sin conexión", "off_p": "No hay internet ahora mismo, pero puedes llamarnos igual. La llamada funciona sin datos.",
+        "sc_call": "Pedir cita", "sc_tips": "Consejos de AC"},
+ "en": {"t": "Install the {brand} app", "s": "Call in one tap when your AC fails.", "ok": "Install",
+        "ios": "On iPhone: tap Share, then “Add to Home Screen”.", "close": "Close",
+        "off_t": "You're offline", "off_p": "There's no internet right now, but you can still call us. The call works without data.",
+        "sc_call": "Book a visit", "sc_tips": "AC tips"},
+}
+
+def app_block(lang):
+    t = APP_TXT[lang]
+    return (f'<div class="appbar" id="appbar" role="dialog" aria-label="{E(fmt(t["t"]))}"><img src="/icon-192.png" alt="{E(S['brand'])}" width="40" height="40" loading="lazy">'
+            f'<p style="margin:0"><b>{E(fmt(t["t"]))}</b><span id="appsub">{E(t["s"])}</span></p>'
+            f'<button class="ok" id="appok" type="button">{t["ok"]}</button><button class="x" id="appx" type="button" aria-label="{t["close"]}">×</button></div>'
+            '<script>(function(){'
+            'if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});'
+            'var ga=function(n,p){if(window.gtag)gtag("event",n,p||{})};'
+            'var app=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;'
+            'if(app){ga("app_abierta");return}'
+            'var ls={g:function(k){try{return localStorage.getItem(k)}catch(e){return null}},s:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};'
+            'var n=(+ls.g("kac_vistas")||0)+1;ls.s("kac_vistas",n);'
+            'var off=+ls.g("kac_app_no")||0;if(Date.now()-off<2592e6||n<2)return;'  # solo a quien vuelve (2ª página o más), y no si lo cerró hace <30 días
+            'var bar=document.getElementById("appbar"),ok=document.getElementById("appok"),ev=null;'
+            'var show=function(){setTimeout(function(){bar.classList.add("on");ga("app_aviso")},4000)};'
+            'document.getElementById("appx").onclick=function(){bar.classList.remove("on");ls.s("kac_app_no",Date.now())};'
+            'window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();ev=e;show()});'
+            'ok.onclick=function(){if(ev){ev.prompt();ev.userChoice.then(function(r){ga("app_respuesta",{respuesta:r.outcome});bar.classList.remove("on")})}};'
+            'window.addEventListener("appinstalled",function(){ga("app_instalada");bar.classList.remove("on")});'
+            'var ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!/crios|fxios/i.test(navigator.userAgent);'
+            f'if(ios){{document.getElementById("appsub").textContent={json.dumps(t["ios"], ensure_ascii=False)};ok.style.display="none";show()}}'
+            '})();</script>')
+
+def app_files():
+    for lang in ("es", "en"):
+        t, b = APP_TXT[lang], base(lang)
+        man = {"name": S["brand"], "short_name": APP_NAME, "lang": lang, "dir": "ltr",
+               "description": fmt(NICHE[lang]["hero_sub"]),
+               "id": b, "start_url": b + "?utm_source=app&utm_medium=pwa", "scope": "/",
+               "display": "standalone", "orientation": "portrait", "background_color": "#FFFFFF", "theme_color": "#0B2545",
+               "categories": ["business", "lifestyle"],
+               "icons": [{"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+                         {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+                         {"src": "/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+                         {"src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}],
+               "shortcuts": [{"name": t["sc_call"], "url": b + "?utm_source=app&utm_medium=atajo#form",
+                              "icons": [{"src": "/icon-192.png", "sizes": "192x192"}]},
+                             {"name": t["sc_tips"], "url": blog_path(lang) + "?utm_source=app&utm_medium=atajo",
+                              "icons": [{"src": "/icon-192.png", "sizes": "192x192"}]}]}
+        write(("" if lang == "es" else "en/") + "manifest.webmanifest", json.dumps(man, ensure_ascii=False, indent=1))
+    # página sin conexión (con el teléfono: la llamada funciona sin datos)
+    for lang in ("es", "en"):
+        t, u = APP_TXT[lang], UI[lang]
+        p = "/offline.html" if lang == "es" else "/en/offline.html"
+        page = (head(lang, f"{t['off_t']} | {S['brand']}", t["off_p"], p, "/en/offline.html" if lang == "es" else "/offline.html", [])
+                .replace("<head>", '<head>\n<meta name="robots" content="noindex">') + header(lang, base("en" if lang == "es" else "es"))
+                + f'<main><section class="cta" style="padding:50px 0"><div class="wrap"><div><h1 style="font-size:40px;margin:0 0 6px;text-transform:uppercase">{t["off_t"]}</h1><p>{t["off_p"]}</p></div>'
+                f'<a class="big" href="tel:{S["phone_tel"]}">{icon("phone", 32)} {S["phone_display"]}</a></div></section></main>' + footer(lang))
+        write(p, page)
+    # trabajador de la app: páginas siempre frescas de internet; fotos guardadas; sin internet → página con el teléfono
+    pre = ["/", "/en/", "/offline.html", "/en/offline.html", "/icon-192.png", "/favicon.svg", IMG_HERO.replace(S["domain"], "")]
+    write("sw.js", f"""// Kendall AC Repairs — app instalable. Generado por build.py (versión {SITE_VERSION}).
+var C="kac-v{SITE_VERSION}-{TODAY}",PRE={json.dumps(pre)};
+self.addEventListener("install",function(e){{e.waitUntil(caches.open(C).then(function(c){{return c.addAll(PRE)}}).then(function(){{return self.skipWaiting()}}))}});
+self.addEventListener("activate",function(e){{e.waitUntil(caches.keys().then(function(k){{return Promise.all(k.filter(function(x){{return x!==C}}).map(function(x){{return caches.delete(x)}}))}}).then(function(){{return self.clients.claim()}}))}});
+self.addEventListener("fetch",function(e){{
+ var r=e.request,u=new URL(r.url);
+ if(r.method!=="GET"||u.pathname.indexOf("/admin")===0)return;
+ var mine=u.origin===location.origin,font=/fonts\\.(googleapis|gstatic)\\.com$/.test(u.hostname);
+ if(!mine&&!font)return;
+ if(r.mode==="navigate"){{
+  e.respondWith(fetch(r).then(function(res){{var cp=res.clone();caches.open(C).then(function(c){{c.put(r,cp)}});return res}})
+   .catch(function(){{return caches.match(r).then(function(m){{return m||caches.match(u.pathname.indexOf("/en/")===0?"/en/offline.html":"/offline.html")}})}}));
+  return;
+ }}
+ if(font||/\\.(png|jpg|jpeg|webp|svg|ico|woff2?)$/.test(u.pathname)){{
+  e.respondWith(caches.match(r).then(function(m){{var f=fetch(r).then(function(res){{if(res.ok||res.type==="opaque"){{var cp=res.clone();caches.open(C).then(function(c){{c.put(r,cp)}})}}return res}}).catch(function(){{return m}});return m||f}}));
+ }}
+}});
+""")
 
 def crumbs_schema(lang, items):
     return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
@@ -1048,7 +1149,18 @@ def extras():
 
 /sitemap.xml
   Cache-Control: public, max-age=3600
+
+/sw.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json
+
+/en/manifest.webmanifest
+  Content-Type: application/manifest+json
 """)
+    app_files()
     write("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: {S['domain']}/sitemap.xml\n")
     # Redirecciones 301: versiones anteriores tenían páginas en inglés en la raíz (/ac-repair-tamiami);
     # Google aún las muestra. Se envían a su dirección actual /en/... (solo si la raíz no tiene esa página).
