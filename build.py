@@ -20,7 +20,7 @@ def load_articles():
     arts.sort(key=lambda a: a[2], reverse=True)
     return arts
 
-SITE_VERSION = "11"
+SITE_VERSION = "12"
 ARTICLES = load_articles()
 
 OUT = os.path.join(os.path.dirname(__file__), "sitio")
@@ -463,6 +463,33 @@ def schema_faq(lang):
             "mainEntity": [{"@type": "Question", "name": fmt(q),
                             "acceptedAnswer": {"@type": "Answer", "text": fmt(a)}} for q, a in NICHE[lang]["faq"]]}
 
+def page_type(path):
+    """Tipo de página para la medición (v12): portada, zona, servicio, blog, nosotros, legal, gracias o error."""
+    if path in (base("es"), base("en")): return "portada"
+    if path in {area_path(l, a[1]) for l in ("es", "en") for a in AREAS}: return "zona"
+    if path in {svc_path(l, sv) for l in ("es", "en") for sv in SERVICES}: return "servicio"
+    if "/blog/" in path: return "blog"
+    if path in (ABOUT["es"]["slug"], ABOUT["en"]["slug"]): return "nosotros"
+    if path in (LEGAL["es"]["thanks"], LEGAL["en"]["thanks"]): return "gracias"
+    if path == "/404.html": return "error"
+    return "legal"
+
+# Medición (v12), va en todas las páginas aunque no haya Google Analytics:
+# - KAC.estado(): open/late/cn/ce según la hora de Miami (lo usa también el aviso abierto/cerrado).
+# - Guarda en la sesión de qué sitio llegó la persona y su primera página.
+# - Al enviar el formulario rellena los campos ocultos (página, tipo, horario, origen, página de entrada).
+# No cambia el número de teléfono: siempre es el mismo (305) 363-7976.
+KAC_JS = ('window.KAC={tipo:"%s",estado:function(){try{var h=+new Intl.DateTimeFormat("en-US",{hour:"numeric",hourCycle:"h23",timeZone:"America/New_York"}).format(new Date());'
+          'if(isNaN(h))return"";return h<7?"ce":h>=22?"cn":h>=21?"late":"open"}catch(e){return""}},'
+          'horario:function(){var s=this.estado();return s?(s==="cn"||s==="ce"?"cerrado":"abierto"):"desconocido"}};'
+          'try{var ss=sessionStorage;if(!ss.getItem("kac_origen")){var q=new URLSearchParams(location.search),o=q.get("utm_source")||(q.get("gclid")?"google_ads":"");'
+          'if(!o&&document.referrer){try{var rh=new URL(document.referrer).hostname;if(rh!==location.hostname)o=rh.replace(/^www\\./,"")}catch(e){}}'
+          'ss.setItem("kac_origen",o||"directo");ss.setItem("kac_entrada",location.pathname)}}catch(e){}'
+          'document.addEventListener("submit",function(e){var f=e.target;if(!f||f.name!=="lead")return;'
+          'function set(n,v){var i=f.querySelector(\'[name="\'+n+\'"]\');if(i)i.value=v}var o="",en="";'
+          'try{o=sessionStorage.getItem("kac_origen")||"";en=sessionStorage.getItem("kac_entrada")||""}catch(x){}'
+          'set("pagina",location.pathname);set("tipo_pagina",KAC.tipo);set("horario",KAC.horario());set("origen",o||"desconocido");set("pagina_entrada",en)},true);')
+
 ALTS = {}
 PAGE_IMG = {}
 def head(lang, title, desc, path, alt_path, schemas, img=None):
@@ -477,12 +504,19 @@ def head(lang, title, desc, path, alt_path, schemas, img=None):
         extra += f'<link rel="preload" as="image" type="image/webp" imagesrcset="{b}-800.webp 800w, {b}.webp {IMG_W.get(local_name(img), 1200)}w" imagesizes="100vw" fetchpriority="high">\n'
     elif img: extra += f'<link rel="preload" as="image" href="{img}" fetchpriority="high">\n'
     if S.get("gsc_verification"): extra += f'<meta name="google-site-verification" content="{S["gsc_verification"]}">\n'
+    extra += f"<script>{KAC_JS % page_type(path)}</script>\n"
     if S.get("ga4_id"):
+        # v12: mismos eventos de siempre (llamada, pedir_cita, formulario) con más datos:
+        # ubicacion = qué botón (cabecera, principal, barra_movil, franja_final, pie, contenido), tipo_pagina, horario, idioma.
         extra += (f'<script async src="https://www.googletagmanager.com/gtag/js?id={S["ga4_id"]}"></script>'
                   f'<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag("js",new Date());gtag("config","{S["ga4_id"]}");'
+                  'function kacDatos(x){x.tipo_pagina=KAC.tipo;x.horario=KAC.horario();x.idioma=document.documentElement.lang;return x}'
                   'document.addEventListener("click",function(e){var a=e.target.closest("a");if(!a)return;var h=a.getAttribute("href")||"";'
-                  'if(h.indexOf("tel:")===0)gtag("event","llamada",{link_url:h});if(h.indexOf("#form")>-1)gtag("event","pedir_cita",{link_url:h});});'
-                  'document.addEventListener("submit",function(e){if(e.target&&e.target.name==="lead")gtag("event","formulario",{idioma:document.documentElement.lang});});</script>\n')
+                  'var ub=a.closest(".hdr")?"cabecera":a.closest(".bar")?"barra_movil":a.closest(".hero")?"principal":a.closest("footer")?"pie":a.closest(".cta")?"franja_final":"contenido";'
+                  'if(h.indexOf("tel:")===0)gtag("event","llamada",kacDatos({link_url:h,ubicacion:ub}));'
+                  'if(h.indexOf("#form")>-1)gtag("event","pedir_cita",kacDatos({link_url:h,ubicacion:ub}));});'
+                  'document.addEventListener("submit",function(e){var f=e.target;if(!f||f.name!=="lead")return;var c=f.querySelector(\'[name="permiso_mensajes"]\');'
+                  'gtag("event","formulario",kacDatos({permiso_mensajes:c&&c.checked?"si":"no"}));});</script>\n')
     ld = "".join(f'<script type="application/ld+json">{json.dumps(s, ensure_ascii=False)}</script>' for s in schemas)
     return f"""<!doctype html>
 <html lang="{lang}">
@@ -540,6 +574,7 @@ def form(lang):
 <label for="q-{lang}">{u['problem']}</label><select id="q-{lang}" name="problema" required><option value="">{u['choose']}</option>{opts}</select>
 <label class="consent" for="c-{lang}"><input id="c-{lang}" type="checkbox" name="permiso_mensajes" value="{'Sí' if lang == 'es' else 'Yes'}"><span>{E(consent)}</span></label>
 <input type="hidden" name="permiso_texto" value="{E(consent)}">
+<input type="hidden" name="pagina"><input type="hidden" name="tipo_pagina"><input type="hidden" name="horario"><input type="hidden" name="origen"><input type="hidden" name="pagina_entrada">
 <button class="btn b-call" type="submit">{u['send']}</button>
 <p class="note">{u['submit_note']} {u['privacy_note']}</p>
 </form></div>"""
@@ -549,9 +584,7 @@ def now_status(lang):
     u = UI[lang]
     data = "".join(f' data-{k}="{E(u[v])}"' for k, v in (("open", "now_open"), ("late", "now_late"), ("cn", "now_closed_night"), ("ce", "now_closed_early")))
     return (f'<p class="now" data-now{data}><i class="dot"></i><span>{E(u["now_def"])}</span></p>'
-            '<script>(function(){var el=document.querySelector("[data-now]");if(!el)return;var h;'
-            'try{h=+new Intl.DateTimeFormat("en-US",{hour:"numeric",hourCycle:"h23",timeZone:"America/New_York"}).format(new Date())}catch(e){return}'
-            'if(isNaN(h))return;var k=h<7?"ce":h>=22?"cn":h>=21?"late":"open";'
+            '<script>(function(){var el=document.querySelector("[data-now]");if(!el||!window.KAC)return;var k=KAC.estado();if(!k)return;'
             'el.querySelector("span").textContent=el.getAttribute("data-"+k);el.className="now "+k})()</script>')
 
 def hero(lang, h1, sub, crumb="", eyebrow=None, img=None):
@@ -1022,10 +1055,11 @@ LEGAL_TXT = {
 "es": {
  "privacy": ("Política de Privacidad", [
   ("Quiénes somos", "{brand} es un servicio de referidos operado por {op}. Conectamos a personas que necesitan servicio con contratistas independientes con licencia en Florida."),
-  ("Qué datos recogemos", "Nombre, teléfono, el problema que nos describes y, si lo das, tu dirección o código postal. También datos básicos de navegación (páginas visitadas, tipo de dispositivo)."),
-  ("Grabación de llamadas", "Las llamadas a nuestro número pueden ser grabadas para control de calidad y para confirmar que tu solicitud se atendió. Se te avisa al inicio de la llamada."),
-  ("Para qué los usamos", "Para coordinar tu servicio y contactarte sobre tu solicitud. No vendemos tus datos a listas de marketing."),
-  ("Con quién los compartimos", "Con el contratista independiente que atenderá tu servicio, y con proveedores técnicos que hacen funcionar esta web (alojamiento y telefonía)."),
+  ("Qué datos recogemos", "Nombre, teléfono, el problema que nos describes y, si lo das, tu dirección o código postal. Con el formulario también guardamos la página desde la que lo enviaste, la primera página que visitaste, de dónde llegaste a la web (por ejemplo, Google o Facebook) y si lo enviaste dentro o fuera de nuestro horario. También datos básicos de navegación (páginas visitadas, tipo de dispositivo)."),
+  ("Grabación de llamadas", "Nuestro número de teléfono funciona con CallRail. Las llamadas se graban para control de calidad y para confirmar que tu solicitud se atendió. Se te avisa al inicio de la llamada, en español e inglés."),
+  ("Google Analytics", "Usamos Google Analytics para saber cómo se usa esta web: qué páginas se visitan, qué botones se tocan (como Llamar o Pedir cita), desde qué tipo de dispositivo y de dónde llegan las visitas. Google Analytics usa cookies. CallRail también envía a Google Analytics datos sobre las llamadas a nuestro número, como la fecha, la duración y si fue contestada, para medir cuántas llamadas recibimos. Puedes bloquear las cookies en tu navegador o instalar el complemento de inhabilitación de Google Analytics: tools.google.com/dlpage/gaoptout."),
+  ("Para qué los usamos", "Para coordinar tu servicio, contactarte sobre tu solicitud y medir qué partes de la web y qué horarios generan más llamadas. No vendemos tus datos a listas de marketing."),
+  ("Con quién los compartimos", "Con el contratista independiente que atenderá tu servicio, y con proveedores técnicos que hacen funcionar esta web y nuestro teléfono: alojamiento (Netlify), telefonía y grabación de llamadas (CallRail) y medición (Google Analytics)."),
   ("Cuánto tiempo los guardamos", "El tiempo necesario para atender tu solicitud y cumplir obligaciones legales o fiscales."),
   ("Tus derechos", "Puedes pedirnos ver, corregir o borrar tus datos escribiendo a {email}."),
   ("Cambios", "Podemos actualizar esta política. La fecha de la última actualización aparece abajo.")]),
@@ -1041,10 +1075,11 @@ LEGAL_TXT = {
 "en": {
  "privacy": ("Privacy Policy", [
   ("Who we are", "{brand} is a referral service operated by {op}. We connect people who need service with independent Florida-licensed contractors."),
-  ("What we collect", "Name, phone, the problem you describe and, if provided, your address or ZIP code. Also basic browsing data (pages visited, device type)."),
-  ("Call recording", "Calls to our number may be recorded for quality control and to confirm your request was handled. You are notified at the start of the call."),
-  ("How we use it", "To coordinate your service and contact you about your request. We do not sell your data to marketing lists."),
-  ("Who we share it with", "The independent contractor who will handle your service, and technical providers that run this website (hosting and phone)."),
+  ("What we collect", "Name, phone, the problem you describe and, if provided, your address or ZIP code. With the form we also store the page you sent it from, the first page you visited, where you came to the site from (for example, Google or Facebook) and whether you sent it during or outside our hours. Also basic browsing data (pages visited, device type)."),
+  ("Call recording", "Our phone number runs on CallRail. Calls are recorded for quality control and to confirm your request was handled. You are notified at the start of the call, in English and Spanish."),
+  ("Google Analytics", "We use Google Analytics to understand how this website is used: which pages are visited, which buttons are tapped (such as Call or Book a visit), what type of device is used and where visits come from. Google Analytics uses cookies. CallRail also sends Google Analytics data about calls to our number, such as the date, duration and whether the call was answered, so we can measure how many calls we receive. You can block cookies in your browser or install the Google Analytics opt-out add-on: tools.google.com/dlpage/gaoptout."),
+  ("How we use it", "To coordinate your service, contact you about your request and measure which parts of the website and which hours bring in the most calls. We do not sell your data to marketing lists."),
+  ("Who we share it with", "The independent contractor who will handle your service, and technical providers that run this website and our phone line: hosting (Netlify), phone service and call recording (CallRail) and measurement (Google Analytics)."),
   ("How long we keep it", "As long as needed to handle your request and meet legal or tax obligations."),
   ("Your rights", "You can ask to see, correct or delete your data by emailing {email}."),
   ("Changes", "We may update this policy. The last update date appears below.")]),
