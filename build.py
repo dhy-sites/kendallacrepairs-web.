@@ -20,7 +20,7 @@ def load_articles():
     arts.sort(key=lambda a: a[2], reverse=True)
     return arts
 
-SITE_VERSION = "10"
+SITE_VERSION = "11"
 ARTICLES = load_articles()
 
 OUT = os.path.join(os.path.dirname(__file__), "sitio")
@@ -111,6 +111,16 @@ UI["es"].update({
     "contact_t": "Contacto", "hours": "Lunes a domingo, 7am – 10pm",
     "map_t": "Mapa de la zona de servicio: {place}",
     "map_note": "Mapa de referencia de la zona que cubrimos. Los técnicos van a tu casa; no es una oficina abierta al público.",
+    # aviso de referidos junto al botón de llamar (v11)
+    "ref_note": "Servicio de referidos: te conectamos con un contratista independiente con licencia de Florida, que te da el precio y hace el trabajo.",
+    # estado abierto/cerrado según la hora de Miami (v11). "now_def" se ve si el navegador no ejecuta JavaScript.
+    "now_def": "Contestamos de 7am a 10pm, los 7 días (hora de Miami)",
+    "now_open": "Abierto ahora: contestamos hasta las 10pm",
+    "now_late": "Abierto hasta las 10pm: llama ya para ver si hay técnico esta noche",
+    "now_closed_night": "Cerrado ahora. Déjanos tus datos y te llamamos mañana desde las 7am",
+    "now_closed_early": "Cerrado ahora. Déjanos tus datos y te llamamos hoy desde las 7am",
+    # permiso para llamar y escribir (ley FTSA de Florida) (v11)
+    "consent": "Acepto que {brand} y el contratista independiente que atienda mi solicitud me llamen o me envíen mensajes de texto al teléfono que di, sobre esta solicitud, incluso con sistemas automáticos. No es obligatorio para recibir servicio: también puedes llamarnos al {phone}. Pueden aplicar cargos por mensajes y datos. Responde STOP para no recibir más mensajes.",
 })
 UI["en"].update({
     "topbar": "Se habla español · Monday to Sunday, 7am – 10pm",
@@ -134,6 +144,13 @@ UI["en"].update({
     "contact_t": "Contact", "hours": "Monday to Sunday, 7am – 10pm",
     "map_t": "Service area map: {place}",
     "map_note": "Reference map of the area we cover. Technicians come to your home; this is not a walk-in office.",
+    "ref_note": "Referral service: we connect you with an independent Florida-licensed contractor, who gives you the price and does the work.",
+    "now_def": "We answer 7am to 10pm, 7 days a week (Miami time)",
+    "now_open": "Open now: we answer until 10pm",
+    "now_late": "Open until 10pm: call now to check for a technician tonight",
+    "now_closed_night": "Closed now. Leave your info and we'll call you tomorrow from 7am",
+    "now_closed_early": "Closed now. Leave your info and we'll call you today from 7am",
+    "consent": "I agree that {brand} and the independent contractor handling my request may call or text me at the phone number I provided about this request, including with automated systems. This is not required to get service: you can also call us at {phone}. Message and data rates may apply. Reply STOP to opt out of texts.",
 })
 
 def px(i, w=1800):
@@ -285,6 +302,11 @@ a{color:var(--navy2)}img{max-width:100%;display:block}
 .hero ul.ticks{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:8px;font-size:16px}
 .hero p.zones{margin:16px 0 0;font-size:15px;color:#C9D6E6;display:flex;gap:6px;align-items:flex-start}.hero p.zones .ic{flex:none;margin-top:3px}
 .hero ul.ticks li{display:flex;gap:8px;align-items:center}.hero ul.ticks .ic{color:#7FD1A0}
+.now{display:flex;gap:9px;align-items:center;margin:16px 0 0;font-weight:700;font-size:16px;color:#fff}
+.now .dot{width:10px;height:10px;border-radius:50%;background:#7FD1A0;flex:none}.now.cn .dot,.now.ce .dot{background:#F5B942}
+.refnote{margin:8px 0 0;font-size:14.5px;line-height:1.45;color:#C9D6E6;max-width:600px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:12.5px;line-height:1.4;color:var(--mut);margin:14px 0 0;cursor:pointer}
+.consent input{width:18px;height:18px;flex:none;margin:1px 0 0;padding:0}
 /* formulario */
 .card-form{background:#fff;color:var(--ink);border-radius:6px;padding:24px;border-top:5px solid var(--red);box-shadow:0 18px 40px rgba(0,0,0,.25)}
 .card-form h2{margin:0 0 4px;font-size:28px;text-transform:uppercase;color:var(--navy)}
@@ -406,18 +428,22 @@ def gmap(lang, place, zoom=12):
             f'<p class="mapnote">{u["map_note"]}</p></div>')
 
 def schema_business(lang):
-    n = NICHE[lang]
+    # v11: Organization (servicio de referidos), no HVACBusiness: no hacemos las reparaciones nosotros.
+    # El horario va en contactPoint porque es el horario del teléfono, no de un local.
     return {
-        "@context": "https://schema.org", "@type": "HVACBusiness",
+        "@context": "https://schema.org", "@type": "Organization",
         "name": S["brand"], "url": S["domain"] + base(lang), "image": IMG_HERO,
         "telephone": S["phone_tel"], "email": S["email"],
-        "description": fmt(n["hero_sub"]),
+        "description": fmt(UI[lang]["disclaimer"]),
+        "parentOrganization": {"@type": "Organization", "name": S["operator"]},
         "areaServed": [{"@type": "Place", "name": f"{a[0]}, {S['state']}"} for a in AREAS] +
                       [{"@type": "City", "name": f"{S['city']}, {S['state']}"}],
-        "openingHoursSpecification": [{"@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-            "opens": "07:00", "closes": "22:00"}],
-        "priceRange": "$$", "knowsLanguage": ["es", "en"],
+        "contactPoint": {"@type": "ContactPoint", "telephone": S["phone_tel"], "contactType": "customer service",
+            "availableLanguage": ["Spanish", "English"],
+            "hoursAvailable": {"@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+                "opens": "07:00", "closes": "22:00"}},
+        "knowsLanguage": ["es", "en"],
         "sameAs": [u for _, u in S.get("social", [])],
         "hasOfferCatalog": {"@type": "OfferCatalog", "name": UI[lang]["svc_t"],
             "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": svc(lang, sv)["name"],
@@ -499,6 +525,8 @@ def header(lang, alt_path):
 def form(lang):
     u, n = UI[lang], NICHE[lang]
     opts = "".join(f"<option>{E(p[1])}</option>" for p in n["problems"]) + f"<option>{u['other']}</option>"
+    # el mismo texto se guarda en un campo oculto para tener prueba de lo que la persona aceptó
+    consent = fmt(u["consent"], phone=S["phone_display"])
     return f"""<div class="card-form" id="form">
 <h2>{u['form_title']}</h2><p>{u['form_sub']}</p>
 <form name="lead" method="POST" action="{LEGAL[lang]['thanks']}" data-netlify="true" netlify-honeypot="bot-field">
@@ -507,9 +535,21 @@ def form(lang):
 <label for="n-{lang}">{u['name']}</label><input id="n-{lang}" name="nombre" required autocomplete="name">
 <label for="p-{lang}">{u['phone']}</label><input id="p-{lang}" name="telefono" type="tel" required autocomplete="tel" inputmode="tel" placeholder="(305) 000-0000">
 <label for="q-{lang}">{u['problem']}</label><select id="q-{lang}" name="problema" required><option value="">{u['choose']}</option>{opts}</select>
+<label class="consent" for="c-{lang}"><input id="c-{lang}" type="checkbox" name="permiso_llamadas" value="{'Sí' if lang == 'es' else 'Yes'}" required><span>{E(consent)}</span></label>
+<input type="hidden" name="permiso_texto" value="{E(consent)}">
 <button class="btn b-call" type="submit">{u['send']}</button>
 <p class="note">{u['privacy_note']}</p>
 </form></div>"""
+
+def now_status(lang):
+    """Abierto/cerrado según la hora de Miami. Sin JavaScript se ve el horario general (now_def)."""
+    u = UI[lang]
+    data = "".join(f' data-{k}="{E(u[v])}"' for k, v in (("open", "now_open"), ("late", "now_late"), ("cn", "now_closed_night"), ("ce", "now_closed_early")))
+    return (f'<p class="now" data-now{data}><i class="dot"></i><span>{E(u["now_def"])}</span></p>'
+            '<script>(function(){var el=document.querySelector("[data-now]");if(!el)return;var h;'
+            'try{h=+new Intl.DateTimeFormat("en-US",{hour:"numeric",hourCycle:"h23",timeZone:"America/New_York"}).format(new Date())}catch(e){return}'
+            'if(isNaN(h))return;var k=h<7?"ce":h>=22?"cn":h>=21?"late":"open";'
+            'el.querySelector("span").textContent=el.getAttribute("data-"+k);el.className="now "+k})()</script>')
 
 def hero(lang, h1, sub, crumb="", eyebrow=None, img=None):
     u = UI[lang]
@@ -520,6 +560,7 @@ def hero(lang, h1, sub, crumb="", eyebrow=None, img=None):
     return f"""<main><section class="hero">{picture(img or IMG_HERO, img_alt(img or IMG_HERO, lang, ""), 1600, 900, lazy=False, sizes="100vw", cls="hbg", high=True)}<div class="wrap"><div>{crumb}{eb}
 <h1>{E(h1)}</h1><p class="sub">{E(sub)}</p>
 <div class="btns"><a class="btn b-call" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']} {S['phone_display']}</a></div>
+{now_status(lang)}<p class="refnote">{E(fmt(u['ref_note']))}</p>
 <ul class="ticks">{ticks}</ul>{zones}</div>{form(lang)}</div></section>
 <div class="trust"><div class="wrap">{''.join(f'<div>{icon(i, 28)}<p style="margin:0"><b>{t}</b><span>{d}</span></p></div>' for i, t, d in u['trust_icons'])}</div></div>"""
 
@@ -815,7 +856,7 @@ def about_page(lang):
     body = "".join(f"<h2>{E(fmt(h, **kw))}</h2><p>{E(fmt(x, **kw))}</p>" for h, x in secs)
     desc = fmt(ab["intro"], **kw)
     org = {"@context": "https://schema.org", "@type": "AboutPage", "name": ab["title"], "url": S["domain"] + p, "inLanguage": lang,
-           "about": {"@type": "HVACBusiness", "name": S["brand"], "url": S["domain"] + base(lang), "telephone": S["phone_tel"], "email": S["email"],
+           "about": {"@type": "Organization", "name": S["brand"], "url": S["domain"] + base(lang), "telephone": S["phone_tel"], "email": S["email"],
                      "parentOrganization": {"@type": "Organization", "name": S["operator"]},
                      "areaServed": {"@type": "City", "name": f"{S['city']}, {S['state']}"}},
            "author": author_schema()}
