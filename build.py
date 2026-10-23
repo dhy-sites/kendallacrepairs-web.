@@ -120,7 +120,9 @@ UI["es"].update({
     "now_closed_night": "Cerrado ahora. Déjanos tus datos y te llamamos mañana desde las 7am",
     "now_closed_early": "Cerrado ahora. Déjanos tus datos y te llamamos hoy desde las 7am",
     # permiso para llamar y escribir (ley FTSA de Florida) (v11)
-    "consent": "Acepto que {brand} y el contratista independiente que atienda mi solicitud me llamen o me envíen mensajes de texto al teléfono que di, sobre esta solicitud, incluso con sistemas automáticos. No es obligatorio para recibir servicio: también puedes llamarnos al {phone}. Pueden aplicar cargos por mensajes y datos. Responde STOP para no recibir más mensajes.",
+    # casilla OPCIONAL: solo mensajes de texto y llamadas de seguimiento. La llamada sobre la solicitud la cubre "submit_note".
+    "consent": "Opcional: acepto que {brand} y el contratista independiente que atienda mi solicitud me envíen mensajes de texto y me hagan llamadas de seguimiento al teléfono que di, incluso con sistemas automáticos. No es obligatorio para recibir servicio. Pueden aplicar cargos por mensajes y datos. Responde STOP para no recibir más mensajes.",
+    "submit_note": "Al enviar, aceptas que te llamemos sobre esta solicitud.",
 })
 UI["en"].update({
     "topbar": "Se habla español · Monday to Sunday, 7am – 10pm",
@@ -150,7 +152,8 @@ UI["en"].update({
     "now_late": "Open until 10pm: call now to check for a technician tonight",
     "now_closed_night": "Closed now. Leave your info and we'll call you tomorrow from 7am",
     "now_closed_early": "Closed now. Leave your info and we'll call you today from 7am",
-    "consent": "I agree that {brand} and the independent contractor handling my request may call or text me at the phone number I provided about this request, including with automated systems. This is not required to get service: you can also call us at {phone}. Message and data rates may apply. Reply STOP to opt out of texts.",
+    "consent": "Optional: I agree that {brand} and the independent contractor handling my request may send me text messages and make follow-up calls to the phone number I provided, including with automated systems. This is not required to get service. Message and data rates may apply. Reply STOP to opt out of texts.",
+    "submit_note": "By submitting, you agree that we may call you about this request.",
 })
 
 def px(i, w=1800):
@@ -526,7 +529,7 @@ def form(lang):
     u, n = UI[lang], NICHE[lang]
     opts = "".join(f"<option>{E(p[1])}</option>" for p in n["problems"]) + f"<option>{u['other']}</option>"
     # el mismo texto se guarda en un campo oculto para tener prueba de lo que la persona aceptó
-    consent = fmt(u["consent"], phone=S["phone_display"])
+    consent = fmt(u["consent"])
     return f"""<div class="card-form" id="form">
 <h2>{u['form_title']}</h2><p>{u['form_sub']}</p>
 <form name="lead" method="POST" action="{LEGAL[lang]['thanks']}" data-netlify="true" netlify-honeypot="bot-field">
@@ -535,10 +538,10 @@ def form(lang):
 <label for="n-{lang}">{u['name']}</label><input id="n-{lang}" name="nombre" required autocomplete="name">
 <label for="p-{lang}">{u['phone']}</label><input id="p-{lang}" name="telefono" type="tel" required autocomplete="tel" inputmode="tel" placeholder="(305) 000-0000">
 <label for="q-{lang}">{u['problem']}</label><select id="q-{lang}" name="problema" required><option value="">{u['choose']}</option>{opts}</select>
-<label class="consent" for="c-{lang}"><input id="c-{lang}" type="checkbox" name="permiso_llamadas" value="{'Sí' if lang == 'es' else 'Yes'}" required><span>{E(consent)}</span></label>
+<label class="consent" for="c-{lang}"><input id="c-{lang}" type="checkbox" name="permiso_mensajes" value="{'Sí' if lang == 'es' else 'Yes'}"><span>{E(consent)}</span></label>
 <input type="hidden" name="permiso_texto" value="{E(consent)}">
 <button class="btn b-call" type="submit">{u['send']}</button>
-<p class="note">{u['privacy_note']}</p>
+<p class="note">{u['submit_note']} {u['privacy_note']}</p>
 </form></div>"""
 
 def now_status(lang):
@@ -685,8 +688,10 @@ def cta(lang):
 # Iconos de redes: Facebook e Instagram de Simple Icons (CC0); Nextdoor con una casita genérica en su color
 SOCIAL_ICONS = {"Facebook": ["0866FF", "M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"], "Instagram": ["FF0069", "M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"], "Nextdoor": ["8ED500", "M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"]}
 
-def footer(lang):
+def footer(lang, has_form=True):
+    """has_form=False en páginas sin formulario (blog, Quiénes somos, legales): "Pedir cita" lleva al formulario de la portada."""
     u = UI[lang]
+    form_href = "#form" if has_form else f"{base(lang)}#form"
     al = "".join(f'<li><a href="{area_path(lang, a[1])}">{a[0]}</a></li>' for a in AREAS)
     sl = "".join(f'<li><a href="{svc_path(lang, sv)}">{E(svc(lang, sv)["name"])}</a></li>' for sv in SERVICES)
     social_li = ('<li class="soc">' + "".join(
@@ -703,7 +708,7 @@ def footer(lang):
 <div class="legalrow"><a href="{ABOUT[lang]['slug']}">{ABOUT[lang]['title']}</a><a href="{LEGAL[lang]['privacy']}">{u['privacy']}</a><a href="{LEGAL[lang]['terms']}">{u['terms']}</a>
 <span>© {datetime.date.today().year} {S['operator']}</span></div>
 </div></footer>
-<div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']}</a><a class="f" href="#form">{icon('check', 20)} {u['book']}</a></div>
+<div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']}</a><a class="f" href="{form_href}">{icon('check', 20)} {u['book']}</a></div>
 </body></html>"""
 
 def crumbs_schema(lang, items):
@@ -795,7 +800,7 @@ def blog_index(lang):
     page = (head(lang, title, desc, p, alt, [bc]) + header(lang, alt)
             + f'<main><section class="blk"><div class="wrap"><div class="crumb" style="color:var(--mut)"><a href="{base(lang)}" style="color:var(--navy2)">{u["home"]}</a> › {t}</div>'
             + f'<div class="head"><h1 class="t" style="font-size:44px">{t}</h1><p class="s">{E(intro)}</p></div><div class="grid g3">{blog_list(lang)}</div></div></section>'
-            + ck + services_grid(lang) + cta(lang) + "</main>" + footer(lang))
+            + ck + services_grid(lang) + cta(lang) + "</main>" + footer(lang, has_form=False))
     write(p, page); PAGES.append(p)
 
 def article_page(lang, art):
@@ -822,7 +827,7 @@ def article_page(lang, art):
             + f'<a class="btn b-call" href="tel:{S["phone_tel"]}">{icon("phone", 20)} {u["call"]} {S["phone_display"]}</a></div></div></section>'
             + f'<section class="blk soft"><div class="wrap"><div class="head"><h2 class="t">{"Servicios relacionados" if lang == "es" else "Related services"}</h2></div><div class="grid g3">{rel}</div></div></section>'
             + (f'<section class="blk"><div class="wrap"><div class="head"><h2 class="t">{"Más consejos" if lang == "es" else "More tips"}</h2></div><div class="grid g3">{blog_list(lang, skip=art[0])}</div></div></section>' if len(ARTICLES) > 1 else "")
-            + cta(lang) + "</main>" + footer(lang))
+            + cta(lang) + "</main>" + footer(lang, has_form=False))
     write(p, page); PAGES.append(p)
 
 def author_schema():
@@ -850,8 +855,8 @@ def about_page(lang):
     zips = ", ".join(sorted({x[2] for x in AREAS if x[2]}))
     zh, zt = (("Zona que atendemos", f"Atendemos {S['city']} y sus barrios: {zone}. Códigos postales: {zips}. Si vives cerca pero no ves tu comunidad, llámanos igual: casi siempre podemos coordinar un técnico.")
               if lang == "es" else ("Area we serve", f"We serve {S['city']} and its neighborhoods: {zone}. ZIP codes: {zips}. If you live nearby but don't see your community, call anyway: we can almost always coordinate a technician."))
-    nh, nt = (("Lo que no hacemos", "No cobramos por la llamada ni por la coordinación, no vendemos tus datos y no enviamos técnicos sin licencia. Si no podemos ayudarte en tu zona o con tu equipo, te lo decimos en la misma llamada.")
-              if lang == "es" else ("What we don't do", "We don't charge for the call or the coordination, we don't sell your data and we never send unlicensed technicians. If we can't help in your area or with your unit, we tell you on the same call."))
+    nh, nt = (("Lo que no hacemos", "No hacemos reparaciones ni instalaciones nosotros: el trabajo, el precio y la garantía son del contratista independiente. No cobramos por la llamada ni por la coordinación, no vendemos tus datos y no enviamos técnicos sin licencia. Si no podemos ayudarte en tu zona o con tu equipo, te lo decimos en la misma llamada.")
+              if lang == "es" else ("What we don't do", "We don't do repairs or installations ourselves: the work, the price and the warranty belong to the independent contractor. We don't charge for the call or the coordination, we don't sell your data and we never send unlicensed technicians. If we can't help in your area or with your unit, we tell you on the same call."))
     secs = list(ab["sections"]) + [(zh, zt), (nh, nt)]
     body = "".join(f"<h2>{E(fmt(h, **kw))}</h2><p>{E(fmt(x, **kw))}</p>" for h, x in secs)
     desc = fmt(ab["intro"], **kw)
@@ -861,13 +866,14 @@ def about_page(lang):
                      "areaServed": {"@type": "City", "name": f"{S['city']}, {S['state']}"}},
            "author": author_schema()}
     bc = crumbs_schema(lang, [(u["home"], base(lang)), (ab["title"], p)])
-    page = (head(lang, f"{ab['title']} | {S['brand']}", desc[:155], p, alt, [org, bc]) + header(lang, alt)
+    meta = desc if len(desc) <= 160 else desc[:157].rsplit(" ", 1)[0] + "…"
+    page = (head(lang, f"{ab['title']} | {S['brand']}", meta, p, alt, [org, bc]) + header(lang, alt)
             + f'<main><section class="blk"><div class="wrap prose"><div class="crumb" style="color:var(--mut)"><a href="{base(lang)}" style="color:var(--navy2)">{u["home"]}</a> › {E(ab["title"])}</div>'
             + f'<h1 class="t" style="font-size:42px">{E(ab["h1"])}</h1><p style="font-size:19px">{E(desc)}</p>{body}'
             + f'<h2>{E(ab["author_t"])}</h2>{author_box(lang)}'
             + f'<div style="background:var(--navy);color:#fff;border-radius:6px;padding:22px;margin-top:30px"><b style="font-size:20px">{E(ab["cta"])}</b><p style="margin:12px 0 0">'
             + f'<a class="btn b-call" href="tel:{S["phone_tel"]}">{icon("phone", 20)} {u["call"]} {S["phone_display"]}</a></p></div></div></section>'
-            + cta(lang) + "</main>" + footer(lang))
+            + cta(lang) + "</main>" + footer(lang, has_form=False))
     write(p, page); PAGES.append(p)
 
 def write(path, content):
@@ -1062,13 +1068,13 @@ def legal_pages(lang):
         upd = ("Última actualización: " if lang == "es" else "Last updated: ") + TODAY
         bc = crumbs_schema(lang, [(UI[lang]["home"], base(lang)), (t, LEGAL[lang][key])])
         page = (head(lang, f"{t} | {S['brand']}", (f"{t} de {S['brand']}, servicio de referidos de aire acondicionado en {S['city']}, FL, operado por {S['operator']}." if lang == "es" else f"{t} of {S['brand']}, an AC referral service in {S['city']}, FL, operated by {S['operator']}."), p, alt, [bc]) + header(lang, alt)
-                + f'<main><section class="blk"><div class="wrap legal"><h1>{t}</h1>{body}<p><em>{upd}</em></p></div></section></main>' + footer(lang))
+                + f'<main><section class="blk"><div class="wrap legal"><h1>{t}</h1>{body}<p><em>{upd}</em></p></div></section></main>' + footer(lang, has_form=False))
         write(p, page); PAGES.append(p)
     t, msg = L["thanks"]
     p, alt = LEGAL[lang]["thanks"], LEGAL[other]["thanks"]
     page = (head(lang, f"{t} | {S['brand']}", t, p, alt, []).replace("<head>", '<head>\n<meta name="robots" content="noindex">') + header(lang, alt)
             + f'<main><section class="cta" style="padding:50px 0"><div class="wrap"><div><h1 style="font-size:40px;margin:0 0 6px;text-transform:uppercase">{t}</h1><p>{msg}</p></div>'
-            f'<a class="big" href="tel:{S["phone_tel"]}">{S["phone_display"]}</a></div></section></main>' + footer(lang))
+            f'<a class="big" href="tel:{S["phone_tel"]}">{S["phone_display"]}</a></div></section></main>' + footer(lang, has_form=False))
     write(p, page)
 
 def extras():
@@ -1107,7 +1113,7 @@ def extras():
                                     [S["domain"] + "/sitemap.xml"]}, ensure_ascii=False, indent=1))
     nf = (head("es", f"Página no encontrada | {S['brand']}", "404", "/404.html", "/en/", []).replace("<head>", '<head>\n<meta name="robots" content="noindex">')
           + header("es", "/en/") + f'<main><section class="cta" style="padding:50px 0"><div class="wrap"><h1 style="font-size:36px;margin:0;text-transform:uppercase">Página no encontrada / Page not found</h1>'
-          f'<a class="big" href="tel:{S["phone_tel"]}">{S["phone_display"]}</a><a class="btn b-navy" href="/">Inicio / Home</a></div></section></main>' + footer("es"))
+          f'<a class="big" href="tel:{S["phone_tel"]}">{S["phone_display"]}</a><a class="btn b-navy" href="/">Inicio / Home</a></div></section></main>' + footer("es", has_form=False))
     write("404.html", nf)
 
 if __name__ == "__main__":
