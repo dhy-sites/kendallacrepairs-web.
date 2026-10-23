@@ -20,7 +20,7 @@ def load_articles():
     arts.sort(key=lambda a: a[2], reverse=True)
     return arts
 
-SITE_VERSION = "11"
+SITE_VERSION = "12"
 ARTICLES = load_articles()
 
 OUT = os.path.join(os.path.dirname(__file__), "sitio")
@@ -463,6 +463,33 @@ def schema_faq(lang):
             "mainEntity": [{"@type": "Question", "name": fmt(q),
                             "acceptedAnswer": {"@type": "Answer", "text": fmt(a)}} for q, a in NICHE[lang]["faq"]]}
 
+def page_type(path):
+    """Tipo de página para la medición (v12): portada, zona, servicio, blog, nosotros, legal, gracias o error."""
+    if path in (base("es"), base("en")): return "portada"
+    if path in {area_path(l, a[1]) for l in ("es", "en") for a in AREAS}: return "zona"
+    if path in {svc_path(l, sv) for l in ("es", "en") for sv in SERVICES}: return "servicio"
+    if "/blog/" in path: return "blog"
+    if path in (ABOUT["es"]["slug"], ABOUT["en"]["slug"]): return "nosotros"
+    if path in (LEGAL["es"]["thanks"], LEGAL["en"]["thanks"]): return "gracias"
+    if path == "/404.html": return "error"
+    return "legal"
+
+# Medición (v12), va en todas las páginas aunque no haya Google Analytics:
+# - KAC.estado(): open/late/cn/ce según la hora de Miami (lo usa también el aviso abierto/cerrado).
+# - Guarda en la sesión de qué sitio llegó la persona y su primera página.
+# - Al enviar el formulario rellena los campos ocultos (página, tipo, horario, origen, página de entrada).
+# No cambia el número de teléfono: siempre es el mismo (305) 363-7976.
+KAC_JS = ('window.KAC={tipo:"%s",estado:function(){try{var h=+new Intl.DateTimeFormat("en-US",{hour:"numeric",hourCycle:"h23",timeZone:"America/New_York"}).format(new Date());'
+          'if(isNaN(h))return"";return h<7?"ce":h>=22?"cn":h>=21?"late":"open"}catch(e){return""}},'
+          'horario:function(){var s=this.estado();return s?(s==="cn"||s==="ce"?"cerrado":"abierto"):"desconocido"}};'
+          'try{var ss=sessionStorage;if(!ss.getItem("kac_origen")){var q=new URLSearchParams(location.search),o=q.get("utm_source")||(q.get("gclid")?"google_ads":"");'
+          'if(!o&&document.referrer){try{var rh=new URL(document.referrer).hostname;if(rh!==location.hostname)o=rh.replace(/^www\\./,"")}catch(e){}}'
+          'ss.setItem("kac_origen",o||"directo");ss.setItem("kac_entrada",location.pathname)}}catch(e){}'
+          'document.addEventListener("submit",function(e){var f=e.target;if(!f||f.name!=="lead")return;'
+          'function set(n,v){var i=f.querySelector(\'[name="\'+n+\'"]\');if(i)i.value=v}var o="",en="";'
+          'try{o=sessionStorage.getItem("kac_origen")||"";en=sessionStorage.getItem("kac_entrada")||""}catch(x){}'
+          'set("pagina",location.pathname);set("tipo_pagina",KAC.tipo);set("horario",KAC.horario());set("origen",o||"desconocido");set("pagina_entrada",en)},true);')
+
 ALTS = {}
 PAGE_IMG = {}
 def head(lang, title, desc, path, alt_path, schemas, img=None):
@@ -477,12 +504,19 @@ def head(lang, title, desc, path, alt_path, schemas, img=None):
         extra += f'<link rel="preload" as="image" type="image/webp" imagesrcset="{b}-800.webp 800w, {b}.webp {IMG_W.get(local_name(img), 1200)}w" imagesizes="100vw" fetchpriority="high">\n'
     elif img: extra += f'<link rel="preload" as="image" href="{img}" fetchpriority="high">\n'
     if S.get("gsc_verification"): extra += f'<meta name="google-site-verification" content="{S["gsc_verification"]}">\n'
+    extra += f"<script>{KAC_JS % page_type(path)}</script>\n"
     if S.get("ga4_id"):
+        # v12: mismos eventos de siempre (llamada, pedir_cita, formulario) con más datos:
+        # ubicacion = qué botón (cabecera, principal, barra_movil, franja_final, pie, contenido), tipo_pagina, horario, idioma.
         extra += (f'<script async src="https://www.googletagmanager.com/gtag/js?id={S["ga4_id"]}"></script>'
                   f'<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag("js",new Date());gtag("config","{S["ga4_id"]}");'
+                  'function kacDatos(x){x.tipo_pagina=KAC.tipo;x.horario=KAC.horario();x.idioma=document.documentElement.lang;return x}'
                   'document.addEventListener("click",function(e){var a=e.target.closest("a");if(!a)return;var h=a.getAttribute("href")||"";'
-                  'if(h.indexOf("tel:")===0)gtag("event","llamada",{link_url:h});if(h.indexOf("#form")>-1)gtag("event","pedir_cita",{link_url:h});});'
-                  'document.addEventListener("submit",function(e){if(e.target&&e.target.name==="lead")gtag("event","formulario",{idioma:document.documentElement.lang});});</script>\n')
+                  'var ub=a.closest(".hdr")?"cabecera":a.closest(".bar")?"barra_movil":a.closest(".hero")?"principal":a.closest("footer")?"pie":a.closest(".cta")?"franja_final":"contenido";'
+                  'if(h.indexOf("tel:")===0)gtag("event","llamada",kacDatos({link_url:h,ubicacion:ub}));'
+                  'if(h.indexOf("#form")>-1)gtag("event","pedir_cita",kacDatos({link_url:h,ubicacion:ub}));});'
+                  'document.addEventListener("submit",function(e){var f=e.target;if(!f||f.name!=="lead")return;var c=f.querySelector(\'[name="permiso_mensajes"]\');'
+                  'gtag("event","formulario",kacDatos({permiso_mensajes:c&&c.checked?"si":"no"}));});</script>\n')
     ld = "".join(f'<script type="application/ld+json">{json.dumps(s, ensure_ascii=False)}</script>' for s in schemas)
     return f"""<!doctype html>
 <html lang="{lang}">
@@ -540,6 +574,7 @@ def form(lang):
 <label for="q-{lang}">{u['problem']}</label><select id="q-{lang}" name="problema" required><option value="">{u['choose']}</option>{opts}</select>
 <label class="consent" for="c-{lang}"><input id="c-{lang}" type="checkbox" name="permiso_mensajes" value="{'Sí' if lang == 'es' else 'Yes'}"><span>{E(consent)}</span></label>
 <input type="hidden" name="permiso_texto" value="{E(consent)}">
+<input type="hidden" name="pagina"><input type="hidden" name="tipo_pagina"><input type="hidden" name="horario"><input type="hidden" name="origen"><input type="hidden" name="pagina_entrada">
 <button class="btn b-call" type="submit">{u['send']}</button>
 <p class="note">{u['submit_note']} {u['privacy_note']}</p>
 </form></div>"""
@@ -549,9 +584,7 @@ def now_status(lang):
     u = UI[lang]
     data = "".join(f' data-{k}="{E(u[v])}"' for k, v in (("open", "now_open"), ("late", "now_late"), ("cn", "now_closed_night"), ("ce", "now_closed_early")))
     return (f'<p class="now" data-now{data}><i class="dot"></i><span>{E(u["now_def"])}</span></p>'
-            '<script>(function(){var el=document.querySelector("[data-now]");if(!el)return;var h;'
-            'try{h=+new Intl.DateTimeFormat("en-US",{hour:"numeric",hourCycle:"h23",timeZone:"America/New_York"}).format(new Date())}catch(e){return}'
-            'if(isNaN(h))return;var k=h<7?"ce":h>=22?"cn":h>=21?"late":"open";'
+            '<script>(function(){var el=document.querySelector("[data-now]");if(!el||!window.KAC)return;var k=KAC.estado();if(!k)return;'
             'el.querySelector("span").textContent=el.getAttribute("data-"+k);el.className="now "+k})()</script>')
 
 def hero(lang, h1, sub, crumb="", eyebrow=None, img=None):
