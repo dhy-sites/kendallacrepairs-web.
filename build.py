@@ -1055,10 +1055,11 @@ LEGAL_TXT = {
 "es": {
  "privacy": ("Política de Privacidad", [
   ("Quiénes somos", "{brand} es un servicio de referidos operado por {op}. Conectamos a personas que necesitan servicio con contratistas independientes con licencia en Florida."),
-  ("Qué datos recogemos", "Nombre, teléfono, el problema que nos describes y, si lo das, tu dirección o código postal. También datos básicos de navegación (páginas visitadas, tipo de dispositivo)."),
-  ("Grabación de llamadas", "Las llamadas a nuestro número pueden ser grabadas para control de calidad y para confirmar que tu solicitud se atendió. Se te avisa al inicio de la llamada."),
-  ("Para qué los usamos", "Para coordinar tu servicio y contactarte sobre tu solicitud. No vendemos tus datos a listas de marketing."),
-  ("Con quién los compartimos", "Con el contratista independiente que atenderá tu servicio, y con proveedores técnicos que hacen funcionar esta web (alojamiento y telefonía)."),
+  ("Qué datos recogemos", "Nombre, teléfono, el problema que nos describes y, si lo das, tu dirección o código postal. Con el formulario también guardamos la página desde la que lo enviaste, la primera página que visitaste, de dónde llegaste a la web (por ejemplo, Google o Facebook) y si lo enviaste dentro o fuera de nuestro horario. También datos básicos de navegación (páginas visitadas, tipo de dispositivo)."),
+  ("Grabación de llamadas", "Nuestro número de teléfono funciona con CallRail. Las llamadas se graban para control de calidad y para confirmar que tu solicitud se atendió. Se te avisa al inicio de la llamada, en español e inglés."),
+  ("Google Analytics", "Usamos Google Analytics para saber cómo se usa esta web: qué páginas se visitan, qué botones se tocan (como Llamar o Pedir cita), desde qué tipo de dispositivo y de dónde llegan las visitas. Google Analytics usa cookies. CallRail también envía a Google Analytics datos sobre las llamadas a nuestro número, como la fecha, la duración y si fue contestada, para medir cuántas llamadas recibimos. Puedes bloquear las cookies en tu navegador o instalar el complemento de inhabilitación de Google Analytics: tools.google.com/dlpage/gaoptout."),
+  ("Para qué los usamos", "Para coordinar tu servicio, contactarte sobre tu solicitud y medir qué partes de la web y qué horarios generan más llamadas. No vendemos tus datos a listas de marketing."),
+  ("Con quién los compartimos", "Con el contratista independiente que atenderá tu servicio, y con proveedores técnicos que hacen funcionar esta web y nuestro teléfono: alojamiento (Netlify), telefonía y grabación de llamadas (CallRail) y medición (Google Analytics)."),
   ("Cuánto tiempo los guardamos", "El tiempo necesario para atender tu solicitud y cumplir obligaciones legales o fiscales."),
   ("Tus derechos", "Puedes pedirnos ver, corregir o borrar tus datos escribiendo a {email}."),
   ("Cambios", "Podemos actualizar esta política. La fecha de la última actualización aparece abajo.")]),
@@ -1074,10 +1075,11 @@ LEGAL_TXT = {
 "en": {
  "privacy": ("Privacy Policy", [
   ("Who we are", "{brand} is a referral service operated by {op}. We connect people who need service with independent Florida-licensed contractors."),
-  ("What we collect", "Name, phone, the problem you describe and, if provided, your address or ZIP code. Also basic browsing data (pages visited, device type)."),
-  ("Call recording", "Calls to our number may be recorded for quality control and to confirm your request was handled. You are notified at the start of the call."),
-  ("How we use it", "To coordinate your service and contact you about your request. We do not sell your data to marketing lists."),
-  ("Who we share it with", "The independent contractor who will handle your service, and technical providers that run this website (hosting and phone)."),
+  ("What we collect", "Name, phone, the problem you describe and, if provided, your address or ZIP code. With the form we also store the page you sent it from, the first page you visited, where you came to the site from (for example, Google or Facebook) and whether you sent it during or outside our hours. Also basic browsing data (pages visited, device type)."),
+  ("Call recording", "Our phone number runs on CallRail. Calls are recorded for quality control and to confirm your request was handled. You are notified at the start of the call, in English and Spanish."),
+  ("Google Analytics", "We use Google Analytics to understand how this website is used: which pages are visited, which buttons are tapped (such as Call or Book a visit), what type of device is used and where visits come from. Google Analytics uses cookies. CallRail also sends Google Analytics data about calls to our number, such as the date, duration and whether the call was answered, so we can measure how many calls we receive. You can block cookies in your browser or install the Google Analytics opt-out add-on: tools.google.com/dlpage/gaoptout."),
+  ("How we use it", "To coordinate your service, contact you about your request and measure which parts of the website and which hours bring in the most calls. We do not sell your data to marketing lists."),
+  ("Who we share it with", "The independent contractor who will handle your service, and technical providers that run this website and our phone line: hosting (Netlify), phone service and call recording (CallRail) and measurement (Google Analytics)."),
   ("How long we keep it", "As long as needed to handle your request and meet legal or tax obligations."),
   ("Your rights", "You can ask to see, correct or delete your data by emailing {email}."),
   ("Changes", "We may update this policy. The last update date appears below.")]),
