@@ -274,7 +274,7 @@ ABOUT = {
     "es": {
         "slug": "/quienes-somos/", "title": "Quiénes somos", "nav": "Nosotros",
         "h1": "Quiénes somos",
-        "intro": "{brand} es un servicio local de coordinación de aire acondicionado para {city}, {county}. No somos un directorio ni un call center: atendemos a los vecinos de {city} y los conectamos con un técnico de AC con licencia de Florida.",
+        "intro": "{brand} es un servicio de referidos de aire acondicionado para {city}, operado por {operator}. Te conectamos con un contratista independiente con licencia de Florida, que te da el precio y hace el trabajo.",
         "sections": [
             ("Qué hacemos", "Cuando llamas, una persona te atiende en español o inglés, entiende qué le pasa a tu equipo y coordina la visita con un técnico licenciado de tu zona, muchas veces el mismo día. Tú recibes el precio antes de aprobar cualquier trabajo."),
             ("Cómo elegimos a los técnicos", "Solo trabajamos con contratistas de aire acondicionado con licencia activa del Estado de Florida y seguro de responsabilidad. Revisamos su licencia, sus reseñas y su tiempo de respuesta antes de enviarles un solo cliente, y los sacamos del sistema si no cumplen."),
@@ -287,7 +287,7 @@ ABOUT = {
     "en": {
         "slug": "/en/about-us/", "title": "About us", "nav": "About",
         "h1": "About us",
-        "intro": "{brand} is a local air conditioning coordination service for {city}, {county}. We're not a directory or a call center: we help {city} neighbors and connect them with a Florida-licensed AC technician.",
+        "intro": "{brand} is an air conditioning referral service for {city}, operated by {operator}. We connect you with an independent Florida-licensed contractor, who gives you the price and does the work.",
         "sections": [
             ("What we do", "When you call, a real person helps you in English or Spanish, understands what's wrong with your unit and schedules a visit with a licensed technician in your area, often the same day. You get the price before approving any work."),
             ("How we choose technicians", "We only work with air conditioning contractors holding an active Florida state license and liability insurance. We check their license, reviews and response time before sending them a single customer, and we remove them if they fall short."),
