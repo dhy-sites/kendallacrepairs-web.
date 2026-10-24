@@ -1,0 +1,11 @@
+{
+  "lang": "es",
+  "tema": "halloween",
+  "escenas": [
+    {"tipo": "titulo", "lineas": ["¿SE FUE", "LA LUZ?", "*NO PRENDAS", "*EL AIRE YA"]},
+    {"tipo": "dato", "grande": "1", "lineas": ["apágalo desde", "el breaker"], "nota": "Antes de que vuelva la luz"},
+    {"tipo": "dato", "grande": "5 min", "lineas": ["espera al volver", "la luz"], "nota": "Así cuidas el equipo"},
+    {"tipo": "frase", "lineas": ["Un generador", "*pequeño", "no mueve un", "aire central"]},
+    {"tipo": "cierre", "pregunta": ["¿Se te ha ido la luz", "este año?"], "nota": ["Guía completa en el blog", "Link en comentarios"]}
+  ]
+}
