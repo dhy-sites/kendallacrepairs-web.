@@ -1,0 +1,11 @@
+{
+  "lang": "en",
+  "tema": "halloween",
+  "escenas": [
+    {"tipo": "titulo", "lineas": ["20 GUESTS", "IN COSTUME.", "*ONE AC.", "*READY?"]},
+    {"tipo": "dato", "grande": "1", "lineas": ["clean filter", "before the party"], "nota": "A dirty filter makes it work harder"},
+    {"tipo": "dato", "grande": "76°F", "lineas": ["on the thermostat", "all night"], "nota": "Lower won't cool faster"},
+    {"tipo": "frase", "lineas": ["The only", "*scare", "should be", "the costume"]},
+    {"tipo": "cierre", "pregunta": ["Hosting a party", "this Halloween?"], "nota": ["Say yes or no in the comments"]}
+  ]
+}
