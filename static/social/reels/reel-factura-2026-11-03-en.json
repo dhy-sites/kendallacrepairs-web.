@@ -1,0 +1,11 @@
+{
+  "lang": "en",
+  "tema": null,
+  "escenas": [
+    {"tipo": "titulo", "lineas": ["FPL BILL UP.", "*AC NOT", "*COOLING?"]},
+    {"tipo": "dato", "grande": "1", "lineas": ["dirty filter makes", "the AC work harder"], "nota": "Change it every 30 to 60 days"},
+    {"tipo": "dato", "grande": "12+", "lineas": ["years old? It uses", "more power to cool"], "nota": "Old units work harder every summer"},
+    {"tipo": "frase", "lineas": ["It may be", "*the unit,", "not you."]},
+    {"tipo": "cierre", "pregunta": ["Did your bill", "go up this year?"], "nota": ["Say yes or no in the comments"]}
+  ]
+}
