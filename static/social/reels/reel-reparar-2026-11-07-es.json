@@ -1,0 +1,11 @@
+{
+  "lang": "es",
+  "tema": null,
+  "escenas": [
+    {"tipo": "titulo", "lineas": ["¿REPARAR", "*O CAMBIAR", "*EL AIRE?"]},
+    {"tipo": "dato", "grande": "12+", "lineas": ["años de uso:", "casi siempre cambiar"], "nota": "En Kendall el aire trabaja el doble"},
+    {"tipo": "dato", "grande": "R-22", "lineas": ["¿Tu aire usa ese gas?", "Ya no se fabrica"], "nota": "Cada recarga es más difícil"},
+    {"tipo": "dato", "grande": "2", "lineas": ["averías en el", "mismo año"], "nota": "Señal de que el equipo se cansó"},
+    {"tipo": "cierre", "pregunta": ["¿Cuántos años", "tiene tu equipo?"], "nota": ["Responde con un número"]}
+  ]
+}
