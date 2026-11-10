@@ -1,0 +1,11 @@
+{
+  "lang": "en",
+  "tema": null,
+  "escenas": [
+    {"tipo": "titulo", "lineas": ["AC LEAKING", "*WATER?", "DON'T WAIT."]},
+    {"tipo": "dato", "grande": "1", "lineas": ["clogged drain is the", "most common cause"], "nota": "Kendall humidity fills it fast"},
+    {"tipo": "dato", "grande": "30-60", "lineas": ["days: change", "the filter"], "nota": "A dirty filter can also cause leaks"},
+    {"tipo": "frase", "lineas": ["Water on", "*the floor?", "Turn it off", "and call today."]},
+    {"tipo": "cierre", "pregunta": ["Has your AC", "ever leaked water?"], "nota": ["Say yes or no in the comments"]}
+  ]
+}
