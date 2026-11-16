@@ -20,7 +20,7 @@ def load_articles():
     arts.sort(key=lambda a: a[2], reverse=True)
     return arts
 
-SITE_VERSION = "12"
+SITE_VERSION = "13"
 ARTICLES = load_articles()
 
 OUT = os.path.join(os.path.dirname(__file__), "sitio")
@@ -543,7 +543,7 @@ def head(lang, title, desc, path, alt_path, schemas, img=None):
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 {FONTS}
-<style>{CSS}</style>
+<style>{CSS}{REV_CSS if REVIEWS else ""}</style>
 {ld}
 </head>
 <body>"""
@@ -738,7 +738,7 @@ def footer(lang, has_form=True):
 <div><h2 class="fh">{u["contact_t"]}</h2><ul><li><a href="tel:{S['phone_tel']}">{S['phone_display']}</a></li>
 <li><a href="mailto:{S['email']}">{S['email']}</a></li><li><a href="{blog_path(lang)}">{'Consejos de AC' if lang == 'es' else 'AC tips'}</a></li><li>{u['hours']}</li><li>{S['city']}, {S['county']} County, {S['state']}</li>{social_li}</ul></div>
 </div>
-<div class="legalrow"><a href="{ABOUT[lang]['slug']}">{ABOUT[lang]['title']}</a><a href="{LEGAL[lang]['privacy']}">{u['privacy']}</a><a href="{LEGAL[lang]['terms']}">{u['terms']}</a>
+<div class="legalrow"><a href="{ABOUT[lang]['slug']}">{ABOUT[lang]['title']}</a><a href="{REV[lang]['slug']}">{REV[lang]['t']}</a><a href="{LEGAL[lang]['privacy']}">{u['privacy']}</a><a href="{LEGAL[lang]['terms']}">{u['terms']}</a>
 <span>© {datetime.date.today().year} {S['operator']}</span></div>
 </div></footer>
 <div class="bar"><a class="c" href="tel:{S['phone_tel']}">{icon('phone', 20)} {u['call']}</a><a class="f" href="{form_href}">{icon('check', 20)} {u['book']}</a></div>
@@ -928,7 +928,7 @@ def home(lang):
     eb = n["hero_q"]
     p = base(lang)
     page = (head(lang, title, desc, p, base(other), [schema_website(lang), schema_business(lang), schema_faq(lang)], img=IMG_HERO) + header(lang, base(other))
-            + hero(lang, h1, fmt(n["hero_sub"]), eyebrow=eb) + services_grid(lang) + why(lang) + how(lang) + prices(lang) + local_block(lang) + areas(lang) + faq(lang) + cta(lang)
+            + hero(lang, h1, fmt(n["hero_sub"]), eyebrow=eb) + services_grid(lang) + why(lang) + how(lang) + reviews_section(lang) + prices(lang) + local_block(lang) + areas(lang) + faq(lang) + cta(lang)
             + "</main>" + footer(lang))
     write(p, page); PAGES.append(p)
 
@@ -1112,6 +1112,142 @@ def legal_pages(lang):
             f'<a class="big" href="tel:{S["phone_tel"]}">{S["phone_display"]}</a></div></section></main>' + footer(lang, has_form=False))
     write(p, page)
 
+# ───────────── v13: reseñas reales de clientes ─────────────
+# Cada reseña es un archivo en resenas/*.json (se añaden desde el panel /admin/ → "Reseñas").
+# Reglas (FTC 16 CFR 465 y políticas de Google): solo reseñas de clientes reales, se publican también las negativas,
+# no se paga ni se regala nada por ellas, y NO se pone schema Review/AggregateRating (Google no lo admite en reseñas propias).
+def load_reviews():
+    out = []
+    for f in glob.glob(os.path.join(ROOT, "resenas", "*.json")):
+        d = json.load(open(f, encoding="utf-8"))
+        if not d.get("publicar", True) or not (d.get("texto") or "").strip(): continue
+        out.append({"nombre": d.get("nombre", "").strip(), "barrio": (d.get("barrio") or "").strip(), "fecha": str(d.get("fecha", ""))[:10],
+                    "fuente": d.get("fuente", "Web"), "enlace": (d.get("enlace") or "").strip(), "estrellas": max(1, min(5, int(d.get("estrellas") or 5))),
+                    "texto": d["texto"].strip(), "idioma": d.get("idioma", "es"), "respuesta": (d.get("respuesta") or "").strip()})
+    out.sort(key=lambda r: r["fecha"], reverse=True)
+    return out
+
+REVIEWS = load_reviews()
+REV_MIN_INDEX = 5   # la página de reseñas no se indexa en Google hasta tener 5 reseñas reales (evita página vacía)
+REV = {"es": {"slug": "/resenas/", "thanks": "/gracias-resena/", "t": "Reseñas", "h1": "Reseñas de clientes en Kendall",
+              "sec": "Lo que dicen nuestros clientes", "all": "Ver todas las reseñas", "leave": "Deja tu reseña",
+              "intro": "Aquí publicamos lo que cuentan los vecinos de {city} que nos llamaron para arreglar su aire acondicionado. Son clientes reales: cada reseña dice de dónde vino (nuestra web, Facebook, Nextdoor o Google) y en qué barrio vive la persona.",
+              "rules_t": "Cómo publicamos las reseñas",
+              "rules": ["Publicamos todas las reseñas de clientes reales, buenas y malas. No escondemos las negativas.",
+                        "Solo quitamos insultos, datos personales (teléfonos, direcciones) o mensajes que no son de un cliente.",
+                        "No pagamos, no regalamos descuentos y no pedimos reseñas a cambio de nada.",
+                        "Solo mostramos el nombre y la inicial del apellido, y el barrio. Tu teléfono nunca se publica.",
+                        "Si una reseña es mala, la respondemos aquí mismo y llamamos al cliente para resolverlo."],
+              "what_t": "Qué evalúan las reseñas",
+              "what": "{brand} es un servicio de referidos: coordinamos la visita y el trabajo lo hace un contratista independiente con licencia de Florida. Por eso una reseña puede hablar de las dos cosas: lo rápido que te atendimos al teléfono y cómo trabajó el técnico en tu casa. Las dos nos importan, porque si el técnico falla, dejamos de enviarle clientes.",
+              "empty": "Todavía no tenemos reseñas publicadas. Si ya te atendimos, la tuya sería la primera y ayudaría mucho a tus vecinos de {city}.",
+              "where_t": "Dónde dejar tu reseña", "where": "Puedes escribirla en el formulario de esta página o en nuestras redes. Elige la que te sea más fácil:",
+              "fb": "Recomendarnos en Facebook", "nd": "Recomendarnos en Nextdoor",
+              "f_name": "Tu nombre (se publica solo el nombre y la inicial)", "f_area": "Tu barrio", "f_stars": "¿Cómo te fue? (1 a 5 estrellas)",
+              "f_text": "Cuéntanos tu experiencia", "f_text_ph": "Qué le pasaba al AC, cuánto tardaron en llegar, cómo te atendió el técnico…",
+              "f_phone": "Teléfono (opcional, no se publica: solo para confirmar que fuiste cliente)",
+              "f_ok": "Acepto que {brand} publique mi reseña en su web con mi nombre, la inicial de mi apellido y mi barrio.",
+              "f_send": "Enviar mi reseña", "f_note": "Revisamos cada reseña antes de publicarla, normalmente en 1 o 2 días.",
+              "reply": "Respuesta de {brand}", "via": "vía", "other": "Otro barrio",
+              "desc": "Reseñas reales de clientes de reparación de aire acondicionado en Kendall, FL. Publicamos las buenas y las malas. Deja la tuya o llama al {phone}.",
+              "thanks_t": "¡Gracias por tu reseña!", "thanks_m": "La revisamos y la publicamos en 1 o 2 días. Si algo salió mal en tu servicio, llámanos y lo resolvemos:"},
+       "en": {"slug": "/en/reviews/", "thanks": "/en/thanks-review/", "t": "Reviews", "h1": "Customer reviews in Kendall",
+              "sec": "What our customers say", "all": "See all reviews", "leave": "Leave a review",
+              "intro": "Here we publish what {city} neighbors who called us to fix their AC have to say. They are real customers: each review shows where it came from (our website, Facebook, Nextdoor or Google) and the neighborhood the person lives in.",
+              "rules_t": "How we publish reviews",
+              "rules": ["We publish every review from real customers, good and bad. We don't hide negative ones.",
+                        "We only remove insults, personal data (phone numbers, addresses) or messages that aren't from a customer.",
+                        "We don't pay, give discounts or ask for reviews in exchange for anything.",
+                        "We only show your first name, last initial and neighborhood. Your phone number is never published.",
+                        "If a review is negative, we reply right here and call the customer to fix it."],
+              "what_t": "What the reviews cover",
+              "what": "{brand} is a referral service: we coordinate the visit and the work is done by an independent Florida-licensed contractor. So a review can talk about both: how fast we helped you on the phone and how the technician worked in your home. Both matter to us, because if a technician lets you down, we stop sending them customers.",
+              "empty": "We don't have published reviews yet. If we already helped you, yours would be the first and would really help your {city} neighbors.",
+              "where_t": "Where to leave your review", "where": "You can write it in the form on this page or on our social pages. Pick whichever is easiest:",
+              "fb": "Recommend us on Facebook", "nd": "Recommend us on Nextdoor",
+              "f_name": "Your name (only first name and last initial are published)", "f_area": "Your neighborhood", "f_stars": "How did it go? (1 to 5 stars)",
+              "f_text": "Tell us about your experience", "f_text_ph": "What was wrong with the AC, how long it took, how the technician treated you…",
+              "f_phone": "Phone (optional, never published: only to confirm you were a customer)",
+              "f_ok": "I agree that {brand} may publish my review on its website with my first name, last initial and neighborhood.",
+              "f_send": "Send my review", "f_note": "We check every review before publishing it, usually within 1 or 2 days.",
+              "reply": "Reply from {brand}", "via": "via", "other": "Other neighborhood",
+              "desc": "Real customer reviews for AC repair in Kendall, FL. We publish the good and the bad. Leave yours or call {phone}.",
+              "thanks_t": "Thanks for your review!", "thanks_m": "We'll check it and publish it within 1 or 2 days. If something went wrong with your service, call us and we'll fix it:"}}
+REV_CSS = (".rv{background:#fff;border:1px solid var(--line);border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:8px}"
+           ".rv .st{color:#E8A317;font-size:20px;letter-spacing:2px}.rv p{margin:0}.rv small{color:var(--mut);font-size:13.5px}"
+           ".rv .rp{background:var(--soft);border-left:3px solid var(--navy2);padding:10px 12px;font-size:15px}"
+           "textarea{width:100%;padding:12px;border:1px solid #C7CFD9;border-radius:4px;font-size:16px;font-family:inherit;min-height:130px}"
+           ".stars{display:flex;gap:6px;flex-wrap:wrap}.stars label{margin:0;font-weight:600;border:1px solid #C7CFD9;border-radius:4px;padding:8px 12px;cursor:pointer}"
+           ".stars input{width:auto;margin-right:6px}")
+
+def rev_card(r, lang):
+    R = REV[lang]
+    who = E(r["nombre"]) + (f" · {E(r['barrio'])}" if r["barrio"] else "")
+    src = E(r["fuente"])
+    if r["enlace"].startswith("http"): src = f'<a href="{E(r["enlace"])}" rel="noopener nofollow" target="_blank" style="color:var(--navy2)">{src}</a>'
+    reply = f'<p class="rp"><b>{E(fmt(R["reply"]))}:</b> {E(r["respuesta"])}</p>' if r["respuesta"] else ""
+    return (f'<div class="rv"><span class="st" role="img" aria-label="{r["estrellas"]} / 5">{"★" * r["estrellas"]}{"☆" * (5 - r["estrellas"])}</span>'
+            f'<p lang="{r["idioma"]}">“{E(r["texto"])}”</p><small><b>{who}</b> · {R["via"]} {src} · {r["fecha"]}</small>{reply}</div>')
+
+def reviews_section(lang):
+    """Bloque para la portada: solo aparece cuando hay al menos una reseña real."""
+    if not REVIEWS: return ""
+    R = REV[lang]
+    cards = "".join(rev_card(r, lang) for r in REVIEWS[:3])
+    return (f'<section class="blk"><div class="wrap"><div class="head"><h2 class="t">{R["sec"]}</h2></div><div class="grid g3">{cards}</div>'
+            f'<p style="margin-top:18px"><a href="{R["slug"]}" style="color:var(--navy2);font-weight:700">{R["all"]} {icon("arrow", 14)}</a></p></div></section>')
+
+def review_form(lang):
+    R = REV[lang]
+    opts = "".join(f"<option>{E(a[0])}</option>" for a in AREAS) + f"<option>{R['other']}</option>"
+    stars = "".join(f'<label><input type="radio" name="estrellas" value="{i}" required{" checked" if i == 5 else ""}>{i} ★</label>' for i in range(5, 0, -1))
+    return f"""<div class="card-form" id="resena"><h2>{R['leave']}</h2>
+<form name="resena" method="POST" action="{R['thanks']}" data-netlify="true" netlify-honeypot="bot-field">
+<input type="hidden" name="form-name" value="resena"><input type="hidden" name="idioma" value="{lang}">
+<p class="hide"><label>No llenar <input name="bot-field"></label></p>
+<label for="rn-{lang}">{R['f_name']}</label><input id="rn-{lang}" name="nombre" required autocomplete="name">
+<label for="rb-{lang}">{R['f_area']}</label><select id="rb-{lang}" name="barrio" required><option value="">{UI[lang]['choose']}</option>{opts}</select>
+<label>{R['f_stars']}</label><div class="stars">{stars}</div>
+<label for="rt-{lang}">{R['f_text']}</label><textarea id="rt-{lang}" name="comentario" required minlength="20" placeholder="{E(R['f_text_ph'])}"></textarea>
+<label for="rp-{lang}">{R['f_phone']}</label><input id="rp-{lang}" name="telefono" type="tel" autocomplete="tel" inputmode="tel" placeholder="(305) 000-0000">
+<label class="consent" for="ro-{lang}"><input id="ro-{lang}" type="checkbox" name="permiso_publicar" value="{'Sí' if lang == 'es' else 'Yes'}" required><span>{E(fmt(R['f_ok']))}</span></label>
+<button class="btn b-call" type="submit">{R['f_send']}</button><p class="note">{R['f_note']}</p>
+</form></div>"""
+
+def reviews_page(lang):
+    other = "en" if lang == "es" else "es"
+    R, u = REV[lang], UI[lang]
+    p, alt = R["slug"], REV[other]["slug"]
+    links = dict(S.get("social", []))
+    fb = links.get("Facebook", "").rstrip("/") + "/reviews"
+    nd = links.get("Nextdoor", "")
+    cards = "".join(rev_card(r, lang) for r in REVIEWS)
+    listing = f'<div class="grid g2" style="margin:10px 0 26px">{cards}</div>' if REVIEWS else f'<p style="font-size:18px;background:var(--soft);padding:18px;border-radius:6px">{E(fmt(R["empty"]))}</p>'
+    rules = "".join(f"<li>{icon('check', 20)}<span>{E(x)}</span></li>" for x in R["rules"])
+    social = (f'<p>{E(R["where"])}</p><div class="btns" style="margin:10px 0 20px">'
+              + (f'<a class="btn b-navy" href="{fb}" rel="noopener" target="_blank">{R["fb"]}</a>' if links.get("Facebook") else "")
+              + (f'<a class="btn b-navy" href="{nd}" rel="noopener" target="_blank">{R["nd"]}</a>' if nd else "") + "</div>")
+    bc = crumbs_schema(lang, [(u["home"], base(lang)), (R["t"], p)])
+    title = f"{R['h1']}, FL | {S['brand']}"
+    page = head(lang, title, fmt(R["desc"], phone=S["phone_display"]), p, alt, [bc])
+    if len(REVIEWS) < REV_MIN_INDEX: page = page.replace("<head>", '<head>\n<meta name="robots" content="noindex">', 1)
+    page = page.replace("</style>", REV_CSS + "</style>", 1)
+    page += (header(lang, alt)
+             + f'<main><section class="blk"><div class="wrap"><div class="crumb" style="color:var(--mut)"><a href="{base(lang)}" style="color:var(--navy2)">{u["home"]}</a> › {R["t"]}</div>'
+             + f'<h1 class="t" style="font-size:42px">{E(R["h1"])}</h1><div class="prose"><p style="font-size:19px">{E(fmt(R["intro"]))}</p></div>{listing}'
+             + f'<div class="split" style="align-items:start"><div><h2 class="t">{R["rules_t"]}</h2><ul class="checks">{rules}</ul>'
+             + f'<h2 class="t" style="margin-top:26px">{R["what_t"]}</h2><p>{E(fmt(R["what"]))}</p>'
+             + f'<h2 class="t" style="margin-top:26px">{R["where_t"]}</h2>{social}</div>{review_form(lang)}</div></div></section>'
+             + cta(lang) + "</main>" + footer(lang, has_form=False))
+    write(p, page)
+    if len(REVIEWS) >= REV_MIN_INDEX: PAGES.append(p)
+    # página de gracias (no se indexa)
+    t, msg = R["thanks_t"], R["thanks_m"]
+    tp, talt = R["thanks"], REV[other]["thanks"]
+    write(tp, head(lang, f"{t} | {S['brand']}", t, tp, talt, []).replace("<head>", '<head>\n<meta name="robots" content="noindex">', 1) + header(lang, talt)
+          + f'<main><section class="cta" style="padding:50px 0"><div class="wrap"><div><h1 style="font-size:40px;margin:0 0 6px;text-transform:uppercase">{t}</h1><p>{msg}</p></div>'
+          f'<a class="big" href="tel:{S["phone_tel"]}">{S["phone_display"]}</a></div></section></main>' + footer(lang, has_form=False))
+
 def extras():
     def alt_links(p):
         a = ALTS.get(p, {})
@@ -1164,6 +1300,7 @@ if __name__ == "__main__":
             article_page(lang, art)
         legal_pages(lang)
         about_page(lang)
+        reviews_page(lang)
     extras()
     st = os.path.join(ROOT, "static")
     if os.path.isdir(st): shutil.copytree(st, OUT, dirs_exist_ok=True)

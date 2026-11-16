@@ -62,3 +62,28 @@ collections:
           - { label: "Limpieza de ductos", value: "limpieza-ductos" }
           - { label: "Termostatos", value: "termostato" }
           - { label: "Mini splits", value: "mini-split" }
+
+  - name: resenas
+    label: Reseñas de clientes
+    label_singular: reseña
+    description: "SOLO reseñas reales de clientes. Copia el texto tal cual (de Facebook, Nextdoor, Google o del formulario de la web) y publica también las malas. La página /resenas/ empieza a salir en Google cuando hay 5."
+    folder: resenas
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: nombre
+    slug: "{{fecha}}-{{fields.nombre}}"
+    summary: "{{fecha}} · {{nombre}} · {{estrellas}}★ · {{fuente}}"
+    sortable_fields: [fecha, estrellas]
+    fields:
+      - { label: "Fecha de la reseña", name: fecha, widget: datetime, time_format: false, date_format: "YYYY-MM-DD", format: "YYYY-MM-DD" }
+      - { label: "Nombre (nombre e inicial del apellido)", name: nombre, widget: string, hint: "Ejemplo: María G." }
+      - { label: "Barrio", name: barrio, widget: string, required: false, hint: "Ejemplo: The Hammocks" }
+      - { label: "Estrellas", name: estrellas, widget: number, value_type: int, min: 1, max: 5, default: 5 }
+      - { label: "Texto de la reseña (tal cual la escribió el cliente)", name: texto, widget: text }
+      - { label: "Idioma del texto", name: idioma, widget: select, options: [{ label: "Español", value: "es" }, { label: "Inglés", value: "en" }], default: "es" }
+      - { label: "De dónde vino", name: fuente, widget: select, options: ["Web", "Facebook", "Nextdoor", "Google", "Yelp"], default: "Web" }
+      - { label: "Enlace a la reseña original (opcional)", name: enlace, widget: string, required: false }
+      - { label: "Respuesta de Kendall AC Repairs (opcional)", name: respuesta, widget: text, required: false }
+      - { label: "Publicar en la web", name: publicar, widget: boolean, default: true, hint: "Quítalo solo si tiene insultos, datos personales o no es de un cliente. Las reseñas malas también se publican." }
