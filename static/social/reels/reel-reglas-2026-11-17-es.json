@@ -1,0 +1,11 @@
+{
+  "lang": "es",
+  "tema": null,
+  "escenas": [
+    {"tipo": "titulo", "lineas": ["¿TU AIRE", "*ESTÁ EN", "*REGLA?"]},
+    {"tipo": "dato", "grande": "Permiso", "lineas": ["Cambiar el equipo", "lleva permiso"], "nota": "Lo saca el contratista, no tú"},
+    {"tipo": "dato", "grande": "14.3", "lineas": ["SEER2 como mínimo", "en un equipo nuevo"], "nota": "Es la eficiencia que exige Florida"},
+    {"tipo": "dato", "grande": "Anclada", "lineas": ["La unidad de afuera", "va fija al piso"], "nota": "Por los huracanes de Miami-Dade"},
+    {"tipo": "cierre", "pregunta": ["¿Tu último cambio", "tuvo permiso?"], "nota": ["Guía completa en el blog", "Link en comentarios"]}
+  ]
+}
